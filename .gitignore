@@ -141,4 +141,12 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+# some currently required untracked files
+check.js
+package-lock.json
+request.js
+test.js
+test2.js
+
 # End of https://www.toptal.com/developers/gitignore/api/node
+
