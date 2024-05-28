@@ -4,8 +4,14 @@ const crypto = require("crypto");
 const sendOTP = require("../utils/sendOTP");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET, TOKEN_EXPIRES } = require("../utils/config");
-const { config } = require("dotenv");
+const {
+  JWT_SECRET,
+  TOKEN_EXPIRES,
+  AWS_BUCKET_NAME,
+} = require("../utils/config");
+
+const s3 = require("../utils/awsConfig");
+const exifParser = require("exif-parser");
 
 const userController = {
   register: async (req, res) => {
@@ -32,9 +38,7 @@ const userController = {
 
       await newUser.save();
 
-      const verificationURL = `${req.protocol}://${req.get(
-        "host"
-      )}/api/users/verify/${emailToken}`;
+      const verificationURL = `${req.protocol}://localhost:5173/users/verify/${emailToken}`;
       const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
 
       await sendEmailToVerifyEmail({
@@ -63,8 +67,6 @@ const userController = {
     try {
       const { token } = req.params;
 
-      const { password } = req.body;
-
       const hashedEmailToken = crypto
         .createHash("sha256")
         .update(token)
@@ -82,22 +84,53 @@ const userController = {
       if (user.isEmailVerified) {
         return res
           .status(200)
-          .json({ message: "Email verification already completed." });
+          .json({ message: "Your email verification already completed." });
       }
 
       user.isEmailVerified = true;
       user.isActive = true;
       await user.save();
 
-      const passwordHash = await bcrypt.hash(password, 10);
+      const userId = user._id.toString();
+
+      res.status(201).json({
+        message: "Your account verified successfully!",
+
+        redirectTo: `create-password/${userId}`,
+      });
+      console.log(userId);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  createPassword: async (req, res) => {
+    try {
+      const { password } = req.body;
+
+      const userId = req.params.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (!user.isEmailVerified) {
+        return res
+          .status(400)
+          .json({ messagge: "Your email is not verfied yet!" });
+      }
+
+      const passwordHash = await bcrypt.hash(password.password, 10);
 
       user.passwordHash = passwordHash;
 
       await user.save();
 
-      res.status(201).json({ message: "User verify successfully" });
+      res.status(200).json({ message: "Password created successfully!" });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -118,7 +151,7 @@ const userController = {
       );
 
       if (!isPasswordCorrect) {
-        return res.status(400).json({ messsage: "Invalid Credentials." });
+        return res.status(400).json({ message: "Invalid Credentials." });
       }
 
       const token = jwt.sign(
@@ -239,9 +272,226 @@ const userController = {
     }
   },
 
+  upload: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const { name, address, phone, description } = req.body;
 
+      const user = await User.findById(userId);
 
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
 
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { originalname, mimetype, size, buffer } = req.file;
+      const key = `${userId}/${originalname}`;
+      const bucketName = AWS_BUCKET_NAME;
+
+      // extraction of gps location data from the image
+      const parser = exifParser.create(buffer);
+      const result = parser.parse();
+
+      let latitude, longitude;
+
+      if (!result.tags.GPSLatitude || !result.tags.GPSLongitude) {
+        return res.status(400).json({
+          message:
+            "The picture that you try to upload has not contained co-ordinates. Make sure your camera is enabled with location",
+        });
+      }
+
+      latitude = result.tags.GPSLatitude;
+      longitude = result.tags.GPSLongitude;
+
+      const params = {
+        Bucket: bucketName,
+        Key: key,
+        Body: buffer,
+        ContentType: mimetype,
+      };
+
+      try {
+        const s3Data = await s3.upload(params).promise();
+
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: userId },
+          {
+            $push: {
+              contributions: {
+                bucket: bucketName,
+                key: s3Data.Key,
+                fileType: mimetype,
+                fileSize: size,
+                location: { latitude, longitude },
+                name,
+                address,
+                phone,
+                description,
+              },
+            },
+          },
+          { new: true, upsert: true }
+        );
+
+        res.status(200).json({ message: "Image uploaded successfully!" });
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getAllImages: async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      const images = await Promise.all(
+        user.contributions.map(async (contribution) => {
+          const params = {
+            Bucket: contribution.bucket,
+            Key: contribution.key,
+            expires: 60 * 60, //for an hour validity
+          };
+
+          const url = await s3.getSignedUrlPromise("getObject", params);
+
+          return {
+            url,
+            fileType: contribution.fileType,
+            fileSize: contribution.fileSize,
+            fileName: contribution.key.split("/")[1],
+          };
+        })
+      );
+
+      res.status(200).json({ images });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getPresignedImageUrl: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const { imageId } = req.params;
+
+      console.log(imageId);
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      const contributed = user.contributions.find(
+        (contribution) => contribution._id.toString() === imageId
+      );
+
+      if (!contributed) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      const params = {
+        Bucket: contributed.bucket,
+        Key: contributed.key,
+        Expires: 60 * 60,
+      };
+
+      const url = await s3.getSignedUrlPromise("getObject", params);
+
+      res.status(200).json({ url });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  deleteUploadedImage: async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const imageId = req.params.imageId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      const contributionIndex = user.contributions.findIndex(
+        (contribution) => contribution._id.toString() === imageId
+      );
+
+      if (!contributionIndex === -1) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      const contribution = user.contributions[contributionIndex];
+
+      const params = {
+        Bucket: contribution.bucket,
+        Key: contribution.key,
+      };
+
+      await s3.deleteObject(params).promise();
+
+      user.contributions.splice(contributionIndex, 1);
+
+      await user.save();
+
+      res.status(200).json({ message: "Image deleted successfully!" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getLocation: async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const imageId = req.params.imageId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      const contributionIndex = user.contributions.findIndex(
+        (contribution) => contribution._id.toString() === imageId
+      );
+
+      if (!contributionIndex === -1) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+
+      const contribution = user.contributions[contributionIndex];
+
+      const { latitude, longitude } = contribution.location;
+
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+      res.status(200).json({ url: googleMapsUrl });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = userController;

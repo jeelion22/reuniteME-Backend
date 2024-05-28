@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 const validator = require("validator");
+const contributionShema = require("./contributions");
 
 const userSchema = mongoose.Schema({
   firstname: {
@@ -54,6 +55,8 @@ const userSchema = mongoose.Schema({
       message: "Password is required",
     },
   },
+
+  contributions: [contributionShema],
 
   userCategory: {
     type: String,

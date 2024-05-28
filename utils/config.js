@@ -23,6 +23,12 @@ const ADMIN_EMAIL_ADDR = process.env.ADMIN_EMAIL_ADDR;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_PHONE = process.env.ADMIN_PHONE;
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
+const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+const AWS_REGION = process.env.AWS_REGION;
+const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const GOOGLE_MAP_API_KEY = process.env.GOOGLE_MAP_API_KEY;
+const GOOGLE_MAP_VERSION = process.env.GOOGLE_MAP_VERSION;
 
 // export all these configuration variables
 module.exports = {
@@ -48,4 +54,10 @@ module.exports = {
   ADMIN_PASSWORD,
   ADMIN_PHONE,
   ADMIN_JWT_SECRET,
+  AWS_BUCKET_NAME,
+  AWS_REGION,
+  AWS_ACCESS_KEY,
+  AWS_SECRET_ACCESS_KEY,
+  GOOGLE_MAP_API_KEY,
+  GOOGLE_MAP_VERSION,
 };
