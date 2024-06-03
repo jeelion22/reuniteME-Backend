@@ -13,6 +13,7 @@ const contributionShema = new mongoose.Schema({
     default: "NA",
     validate: {
       validator: (phone) =>
+        phone === "" ||
         phone === "NA" ||
         validator.isMobilePhone(phone, "any", { strictMode: false }),
       message: (props) => `${props.value} is not a valid phone number`,
@@ -26,6 +27,11 @@ const contributionShema = new mongoose.Schema({
   fileType: String,
   fileSize: Number,
   location: { latitude: Number, longitude: Number },
+  status: {
+    type: String,
+    enum: ["rescued", "not-rescued"],
+    default: "not-rescued",
+  },
 });
 
 module.exports = contributionShema;
