@@ -389,8 +389,6 @@ const userController = {
       const userId = req.userId;
       const { imageId } = req.params;
 
-      console.log(imageId);
-
       const user = await User.findById(userId);
 
       if (!user) {
@@ -487,6 +485,99 @@ const userController = {
       const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
       res.status(200).json({ url: googleMapsUrl });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+  updateContribution: async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const { contributionId } = req.params;
+
+      const { name, address, phone, description } = req.body;
+
+      const user = await User.findById(userId);
+
+      const contribution = user.contributions.find(
+        (contribution) => contribution._id.toString() == contributionId
+      );
+
+      if (!contribution) {
+        return res.status(400).json({ message: "No information found" });
+      }
+
+      if (name) contribution.name = name;
+      if (address) contribution.address = address;
+      if (phone) contribution.phone = phone;
+      if (description) contribution.description = description;
+
+      if (req.file) {
+        const { originalname, mimetype, size, buffer } = req.file;
+        const key = `${userId}/${originalname}`;
+        const bucketName = AWS_BUCKET_NAME;
+
+        const parser = exifParser.create(buffer);
+        const result = parser.parse();
+
+        if (!result.tags.GPSLatitude || !result.tags.GPSLongitude) {
+          return res.status(400).json({
+            message:
+              "The picture that you tried to upload did not have location information. Make sure camera is enabled with location",
+          });
+        }
+
+        latitude = result.tags.GPSLatitude;
+        longitude = result.tags.GPSLongitude;
+
+        // deleting old file in S3
+
+        if (contribution.key) {
+          deleteParams = {
+            Bucket: bucketName,
+            Key: contribution.key,
+          };
+
+          try {
+            await s3.deleteObject(deleteParams).promise();
+          } catch (error) {
+            console.log("Error deleting old file from s3:", error);
+            return res
+              .status(500)
+              .json({ message: "Error deleting old file from s3" });
+          }
+        }
+
+        // uploadfing new file to S3
+
+        const uploadParams = {
+          Bucket: bucketName,
+          Key: key,
+          Body: buffer,
+          contentType: mimetype,
+        };
+
+        try {
+          const s3Data = await s3.upload(uploadParams).promise();
+
+          // updating contribution with new file info
+          contribution.bucket = bucketName;
+          contribution.key = s3Data.Key;
+          contribution.fileType = mimetype;
+          contribution.fileSize = size;
+          contribution.location = { latitude, longitude };
+        } catch (error) {
+          console.log("Error uploading new file to S3:", error);
+          res.status(500).json({ message: "Error uploading new file to S3" });
+        }
+      }
+
+      await user.save();
+
+      res
+        .status(200)
+        .json({ message: "Reunite seeker information updated successfully!" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
