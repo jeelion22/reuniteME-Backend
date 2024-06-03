@@ -44,6 +44,11 @@ userRouter.get(
 );
 
 userRouter.get("/maps/:imageId", auth.isAuth, userController.getLocation);
+userRouter.put(
+  "/update/:contributionId", upload.single("file"),
+  auth.isAuth,
+  userController.updateContribution
+);
 
 // routes for admin
 
