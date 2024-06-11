@@ -16,7 +16,10 @@ const exifParser = require("exif-parser");
 const userController = {
   register: async (req, res) => {
     try {
-      const { firstname, lastname, email, phone } = req.body;
+      // const { firstname, lastname, email, phone } = req.body;
+
+      const email = req.body.email;
+
       const user = await User.findOne({ email });
 
       if (user) {
@@ -27,12 +30,16 @@ const userController = {
         });
       }
 
-      const newUser = new User({
-        firstname,
-        lastname,
-        email,
-        phone,
-      });
+      const newUser = new User(
+        //   {
+        //   firstname,
+        //   lastname,
+        //   email,
+        //   phone,
+        // }
+
+        req.body
+      );
 
       const emailToken = newUser.createEmailVerificationToken();
 
@@ -358,26 +365,57 @@ const userController = {
         return res.status(400).json({ message: "User not found" });
       }
 
-      const images = await Promise.all(
-        user.contributions.map(async (contribution) => {
+      const result = await User.aggregate([
+        {
+          $match: {
+            contribution: { $ne: [] },
+          },
+        },
+        {
+          $unwind: "$contributions",
+        },
+        {
+          $group: {
+            _id: null,
+            allContributions: {
+              $push: "$contributions",
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            allContributions: 1,
+          },
+        },
+      ]);
+
+      // Extract all contributions from the result
+      const allContributions = result[0]?.allContributions || [];
+
+      // generating signed urls
+      await Promise.all(
+        allContributions.map(async (contribution) => {
           const params = {
             Bucket: contribution.bucket,
             Key: contribution.key,
-            expires: 60 * 60, //for an hour validity
+            Expires: 60 * 60,
           };
 
           const url = await s3.getSignedUrlPromise("getObject", params);
 
-          return {
-            url,
-            fileType: contribution.fileType,
-            fileSize: contribution.fileSize,
-            fileName: contribution.key.split("/")[1],
-          };
+          contribution["url"] = url;
+          (contribution["fileType"] = contribution.fileType),
+            (contribution["fileSize"] = contribution.fileSize),
+            (contribution["fileName"] = contribution.key.split("/")[1]);
         })
       );
 
-      res.status(200).json({ images });
+      const filteredContributions = allContributions.map(
+        ({ bucket, key, ...rest }) => rest
+      );
+
+      res.status(200).send(filteredContributions);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });

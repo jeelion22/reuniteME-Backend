@@ -45,7 +45,6 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
   passwordHash: {
     type: String,
     validate: {
@@ -55,14 +54,50 @@ const userSchema = mongoose.Schema({
       message: "Password is required",
     },
   },
-
   contributions: [contributionShema],
-
   userCategory: {
     type: String,
     enum: ["communityUploader", "reuniteSeeker", "both"],
     default: "communityUploader",
     required: true,
+  },
+  address: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return this.userCategory === "reuniteSeeker" ||
+          this.userCategory === "both"
+          ? !!v
+          : true;
+      },
+      message: "Address is required for Reunite Seeker or Both categories.",
+    },
+  },
+  authorizedIdType: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return this.userCategory === "reuniteSeeker" ||
+          this.userCategory === "both"
+          ? !!v
+          : true;
+      },
+      message:
+        "Authorized ID Type is required for Reunite Seeker or Both categories.",
+    },
+  },
+  authorizedIdNo: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return this.userCategory === "reuniteSeeker" ||
+          this.userCategory === "both"
+          ? !!v
+          : true;
+      },
+      message:
+        "Authorized ID Number is required for Reunite Seeker or Both categories.",
+    },
   },
   role: {
     type: String,
@@ -77,7 +112,6 @@ const userSchema = mongoose.Schema({
   accountDeletetedAt: {
     type: Date,
   },
-
   whoDeleted: [
     {
       userId: {
@@ -85,16 +119,13 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
-
       role: {
         type: String,
         enum: ["Admin", "User"],
       },
-
       deletionDate: { type: Date, default: Date.now },
     },
   ],
-
   emailVerificationToken: String,
   emailVerificationTokenExpires: Date,
   otp: String,
