@@ -45,9 +45,22 @@ userRouter.get(
 
 userRouter.get("/maps/:imageId", auth.isAuth, userController.getLocation);
 userRouter.put(
-  "/update/:contributionId", upload.single("file"),
+  "/update/:contributionId",
+  upload.single("file"),
   auth.isAuth,
   userController.updateContribution
+);
+
+userRouter.post(
+  "/maps/location/:contributionId",
+  auth.isAuth,
+  userController.getLocationForReuniteSeeker
+);
+
+userRouter.get(
+  "/contribution/status/:contributionId",
+  auth.isAuth,
+  userController.getStatus
 );
 
 // routes for admin

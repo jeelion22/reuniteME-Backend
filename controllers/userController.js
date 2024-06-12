@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Visitors = require("../models/reuniteSeekerLogs");
 const sendEmailToVerifyEmail = require("../utils/email");
 const crypto = require("crypto");
 const sendOTP = require("../utils/sendOTP");
@@ -493,6 +494,64 @@ const userController = {
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
+    }
+  },
+
+  getLocationForReuniteSeeker: async (req, res) => {
+    try {
+      const userId = req.userId;
+
+      const contributionId = req.params.contributionId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (!user.userCategory === "reuniteSeeker") {
+        return res.status(400).json({
+          message: "User is not authorized!",
+        });
+      }
+
+      req.body["visitorsId"] = userId.toString();
+      req.body["contributionId"] = contributionId;
+
+      const visitor = new Visitors(req.body);
+      await visitor.save();
+
+      res.status(200).json({ message: "Success!" });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  getStatus: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const contributionId = req.params.contributionId;
+      const user = await User.findById( userId );
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (!user.userCategory === "reuniteSeeker") {
+        return res.status(400).json({
+          message: "User is not authorized!",
+        });
+      }
+
+      const contribution = await Visitors.findOne({
+        contributionId: contributionId,
+        visitorsId: userId,
+        meetingDate: { $gt: Date.now() },
+      });
+
+      res.status(200).json({ message: contribution });
+    } catch (error) {
+      console.log(error);
     }
   },
 
