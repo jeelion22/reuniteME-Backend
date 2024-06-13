@@ -531,7 +531,45 @@ const userController = {
     try {
       const userId = req.userId;
       const contributionId = req.params.contributionId;
-      const user = await User.findById( userId );
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (!user.userCategory === "reuniteSeeker") {
+        return res.status(400).json({
+          message: "User is not authorized!",
+        });
+      }
+
+      let contribution = await Visitors.findOne({
+        contributionId: contributionId,
+        visitorsId: userId,
+        meetingDate: { $gt: Date.now() },
+      });
+
+      if (!contribution){
+
+      contribution = await Visitors.findOne({
+        contributionId: contributionId,
+        visitorsId: {$ne: contributionId},
+        meetingDate: {$gt: Date.now()},
+        checking: true
+      })}
+
+   
+      res.status(200).json({ message: contribution });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  updateStatus: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const contributionId = req.params.contributionId;
+      const user = await User.findById(userId);
 
       if (!user) {
         return res.status(400).json({ message: "User not found" });
@@ -547,11 +585,51 @@ const userController = {
         contributionId: contributionId,
         visitorsId: userId,
         meetingDate: { $gt: Date.now() },
+        checking: true,
       });
 
-      res.status(200).json({ message: contribution });
+      
+
+      if (!contribution) {
+        return res.status(400).json({
+          message: "Contribution not found or meeting date has passsed",
+        });
+      }
+
+      if (req.body !== "not-rescued") {
+        contribution.checking = false;
+        contribution.status = "rescued";
+
+        await contribution.save();
+
+        const updateResult = await User.updateOne(
+          { "contributions._id": contributionId },
+          {
+            $set: {
+              "contributions.$.status": req.body.status,
+            },
+          }
+        );
+
+        if (updateResult.nModified === 0) {
+          return res
+            .status(400)
+            .json({ message: "contribution status update failed" });
+        }
+
+        return res
+          .status(200)
+          .json({ message: "Status updated successfully!" });
+      }
+
+      contribution.checking = false;
+
+      await contribution.save();
+
+      res.status(200).json({ message: "Status updated successfully!" });
     } catch (error) {
       console.log(error);
+      res.status(500).json({ message: error.message });
     }
   },
 

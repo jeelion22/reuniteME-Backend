@@ -62,6 +62,11 @@ userRouter.get(
   auth.isAuth,
   userController.getStatus
 );
+userRouter.put(
+  "/contribution/status/update/:contributionId",
+  auth.isAuth,
+  userController.updateStatus
+);
 
 // routes for admin
 
