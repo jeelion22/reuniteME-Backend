@@ -12,6 +12,7 @@ const reuniteSeekersLogsSchema = new mongoose.Schema({
   },
   relationship: {
     type: String,
+    required: true,
   },
 
   lastSeen: {
@@ -50,8 +51,8 @@ const reuniteSeekersLogsSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["rescued", "not-rescued"],
-    default: "not-rescued"
-  }
+    default: "not-rescued",
+  },
 });
 
 module.exports = mongoose.model(

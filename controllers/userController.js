@@ -188,7 +188,7 @@ const userController = {
       const userId = req.userId;
 
       const user = await User.findOne({ _id: userId, isActive: true }).select(
-        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires -_id -whoDeleted"
+        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -whoDeleted"
       );
 
       if (!user) {
@@ -546,19 +546,19 @@ const userController = {
       let contribution = await Visitors.findOne({
         contributionId: contributionId,
         visitorsId: userId,
-        meetingDate: { $gt: Date.now() },
+        meetingDate: { $gte: Date.now() },
+        checking: true,
       });
 
-      if (!contribution){
+      if (!contribution) {
+        contribution = await Visitors.findOne({
+          contributionId: contributionId,
+          visitorsId: { $ne: userId },
+          meetingDate: { $gt: Date.now() },
+          checking: true,
+        });
+      }
 
-      contribution = await Visitors.findOne({
-        contributionId: contributionId,
-        visitorsId: {$ne: contributionId},
-        meetingDate: {$gt: Date.now()},
-        checking: true
-      })}
-
-   
       res.status(200).json({ message: contribution });
     } catch (error) {
       console.log(error);
@@ -584,11 +584,9 @@ const userController = {
       const contribution = await Visitors.findOne({
         contributionId: contributionId,
         visitorsId: userId,
-        meetingDate: { $gt: Date.now() },
+        meetingDate: { $gte: Date.now() },
         checking: true,
       });
-
-      
 
       if (!contribution) {
         return res.status(400).json({
@@ -596,7 +594,7 @@ const userController = {
         });
       }
 
-      if (req.body !== "not-rescued") {
+      if (req.body === "rescued") {
         contribution.checking = false;
         contribution.status = "rescued";
 
