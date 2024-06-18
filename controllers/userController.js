@@ -201,6 +201,45 @@ const userController = {
     }
   },
 
+  forgotPassword: async (req, res) => {
+    try {
+      const email = req.body.email;
+
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        res.status(400).json({ message: "User is not found" });
+      }
+
+      const emailToken = user.createEmailVerificationToken();
+
+      const verificationURL = `${req.protocol}://localhost:5001/api/users/passwod/reset/verify/${emailToken}`;
+
+      const message = `Please use the link below to reset password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
+
+      await sendEmailToVerifyEmail({
+        email: user.email,
+        subject: "Password reset link for your ReUniteME account",
+        message: message,
+      });
+
+      await user.save();
+
+      res.status(200).json({
+        status: "success",
+        message:
+          "Password reset link successfully sent to your resgistered email address.",
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  verifyPasswordResetLink: this.verify,
+
+
+
   update: async (req, res) => {
     try {
       const userId = req.userId;
