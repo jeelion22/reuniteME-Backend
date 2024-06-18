@@ -68,6 +68,10 @@ userRouter.put(
   userController.updateStatus
 );
 
+userRouter.put(
+  "/password/reset", userController.forgotPassword
+)
+
 // routes for admin
 
 module.exports = userRouter;
