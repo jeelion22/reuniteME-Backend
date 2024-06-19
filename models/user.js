@@ -130,6 +130,11 @@ const userSchema = mongoose.Schema({
   emailVerificationTokenExpires: Date,
   otp: String,
   otpExpires: Date,
+
+  isRequestedPasswordReset: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.methods.createEmailVerificationToken = function () {
