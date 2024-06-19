@@ -68,9 +68,14 @@ userRouter.put(
   userController.updateStatus
 );
 
-userRouter.put(
-  "/password/reset", userController.forgotPassword
-)
+userRouter.put("/password/reset", userController.forgotPassword);
+
+userRouter.get(
+  "/password/reset/verify/:token",
+  userController.verifyPasswordResetLink
+);
+
+userRouter.put("/password/reset/:userId", userController.resetPassword);
 
 // routes for admin
 
