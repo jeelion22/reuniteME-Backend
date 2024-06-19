@@ -86,7 +86,9 @@ const userController = {
       });
 
       if (!user) {
-        return res.status(400).json({ message: "Invalid link or has expired" });
+        return res
+          .status(400)
+          .json({ message: "Invalid link or it has expired" });
       }
 
       if (user.isEmailVerified) {
@@ -97,6 +99,7 @@ const userController = {
 
       user.isEmailVerified = true;
       user.isActive = true;
+      user.emailVerificationToken = undefined;
       await user.save();
 
       const userId = user._id.toString();
@@ -131,7 +134,7 @@ const userController = {
           .json({ messagge: "Your email is not verfied yet!" });
       }
 
-      const passwordHash = await bcrypt.hash(password.password, 10);
+      const passwordHash = await bcrypt.hash(password, 10);
 
       user.passwordHash = passwordHash;
 
@@ -205,15 +208,19 @@ const userController = {
     try {
       const email = req.body.email;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({
+        email,
+        isActive: true,
+        isEmailVerified: true,
+      });
 
       if (!user) {
-        res.status(400).json({ message: "User is not found" });
+        return res.status(400).json({ message: "User not found" });
       }
 
       const emailToken = user.createEmailVerificationToken();
 
-      const verificationURL = `${req.protocol}://localhost:5001/api/users/passwod/reset/verify/${emailToken}`;
+      const verificationURL = `${req.protocol}://localhost:5173/users/passwod/reset/verify/${emailToken}`;
 
       const message = `Please use the link below to reset password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
 
@@ -236,9 +243,67 @@ const userController = {
     }
   },
 
-  verifyPasswordResetLink: this.verify,
+  verifyPasswordResetLink: async (req, res) => {
+    try {
+      const { token } = req.params;
 
+      const hashedEmailToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
 
+      const user = await User.findOne({
+        emailVerificationToken: hashedEmailToken,
+        emailVerificationTokenExpires: { $gt: Date.now() },
+      });
+
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "Invalid link or the link has expired." });
+      }
+      user.emailVerificationToken = undefined;
+      user.emailVerificationTokenExpires = undefined;
+      user.isRequestedPasswordReset = true;
+      await user.save();
+
+      res.status(200).json({ message: "Your account verified successfully!" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const { password } = req.body;
+
+      const userId = req.params.userId;
+
+      const user = await User.findOne({
+        _id: userId,
+        isRequestedPasswordReset: true,
+      });
+
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: "User not found or unauthorized request" });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      user.isRequestedPasswordReset = false;
+
+      user.passwordHash = passwordHash;
+
+      await user.save();
+
+      res.status(200).json({ message: "Password reset done successfully!" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 
   update: async (req, res) => {
     try {
