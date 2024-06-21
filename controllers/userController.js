@@ -220,7 +220,7 @@ const userController = {
 
       const emailToken = user.createEmailVerificationToken();
 
-      const verificationURL = `${req.protocol}://localhost:5173/users/passwod/reset/verify/${emailToken}`;
+      const verificationURL = `${req.protocol}://localhost:5173/users/password/reset/verify/${emailToken}`;
 
       const message = `Please use the link below to reset password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
 
@@ -267,7 +267,11 @@ const userController = {
       user.isRequestedPasswordReset = true;
       await user.save();
 
-      res.status(200).json({ message: "Your account verified successfully!" });
+      const userId = user._id.toString()
+
+      console.log(userId)
+
+      res.status(200).json({ message: "Your account verified successfully!", redirectTo: userId });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -311,35 +315,66 @@ const userController = {
 
       const { phone } = req.body;
 
+      
+
       const user = await User.findById(userId);
 
       if (!user) {
         return res.status(400).json({ message: "User not found" });
       }
 
-      let updatedUser;
+      if (["reuniteSeeker", "both"].includes(user.userCategory)){
+        user.firstname = req.body.firstname;
+        user.lastname = req.body.lastname;
+        user.phone = req.body.phone
+        user.address = req.body.address;
+        user.authorizedIdType = req.body.authorizedIdType;
+        user.authorizedIdNo = req.body.authorizedIdNo
 
-      if (phone && phone != user.phone) {
-        if (user.prevPhones) {
-          user.prevPhones.push(user.phone);
-          user.phone = phone;
-          updatedUser = await user.save();
-        } else {
-          user.prevPhones = [];
-          user.prevPhones.push(user.phone);
-          user.phone = phone;
-          updatedUser = await user.save();
-        }
+        await user.save()
 
-        res
-          .status(200)
-          .json({ message: `Phone number ${phone} updated successfully` });
-      } else {
-        res
-          .status(200)
-          .json({ message: `Phone number ${phone} already exists.` });
+        return res.status(200).json({message: "User's profile information updated successfully!"})
       }
+
+
+      else{
+        user.firstname = req.body.firstname;
+        user.lastname = req.body.lastname;
+        user.phone = req.body.phone
+
+        await user.save()
+
+        return res.status(200).json({message: "User's profile information updated successfully!"})
+      }
+
+
+
+      
+
+      // let updatedUser;
+
+      // if (phone && phone != user.phone) {
+      //   if (user.prevPhones) {
+      //     user.prevPhones.push(user.phone);
+      //     user.phone = phone;
+      //     updatedUser = await user.save();
+      //   } else {
+      //     user.prevPhones = [];
+      //     user.prevPhones.push(user.phone);
+      //     user.phone = phone;
+      //     updatedUser = await user.save();
+      //   }
+
+      //   res
+      //     .status(200)
+      //     .json({ message: `Phone number ${phone} updated successfully` });
+      // } else {
+      //   res
+      //     .status(200)
+      //     .json({ message: `Phone number ${phone} already exists.` });
+      // }
     } catch (error) {
+
       res.status(500).json({ message: error.message });
     }
   },
