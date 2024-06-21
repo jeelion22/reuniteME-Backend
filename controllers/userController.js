@@ -267,11 +267,16 @@ const userController = {
       user.isRequestedPasswordReset = true;
       await user.save();
 
-      const userId = user._id.toString()
+      const userId = user._id.toString();
 
-      console.log(userId)
+      console.log(userId);
 
-      res.status(200).json({ message: "Your account verified successfully!", redirectTo: userId });
+      res
+        .status(200)
+        .json({
+          message: "Your account verified successfully!",
+          redirectTo: userId,
+        });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -313,43 +318,40 @@ const userController = {
     try {
       const userId = req.userId;
 
-      const { phone } = req.body;
-
-      
-
       const user = await User.findById(userId);
 
       if (!user) {
         return res.status(400).json({ message: "User not found" });
       }
 
-      if (["reuniteSeeker", "both"].includes(user.userCategory)){
+      if (["reuniteSeeker", "both"].includes(user.userCategory)) {
         user.firstname = req.body.firstname;
         user.lastname = req.body.lastname;
-        user.phone = req.body.phone
+        user.phone = req.body.phone;
         user.address = req.body.address;
         user.authorizedIdType = req.body.authorizedIdType;
-        user.authorizedIdNo = req.body.authorizedIdNo
+        user.authorizedIdNo = req.body.authorizedIdNo;
 
-        await user.save()
+        await user.save();
 
-        return res.status(200).json({message: "User's profile information updated successfully!"})
-      }
-
-
-      else{
+        return res
+          .status(200)
+          .json({
+            message: "User's profile information updated successfully!",
+          });
+      } else {
         user.firstname = req.body.firstname;
         user.lastname = req.body.lastname;
-        user.phone = req.body.phone
+        user.phone = req.body.phone;
 
-        await user.save()
+        await user.save();
 
-        return res.status(200).json({message: "User's profile information updated successfully!"})
+        return res
+          .status(200)
+          .json({
+            message: "User's profile information updated successfully!",
+          });
       }
-
-
-
-      
 
       // let updatedUser;
 
@@ -374,7 +376,6 @@ const userController = {
       //     .json({ message: `Phone number ${phone} already exists.` });
       // }
     } catch (error) {
-
       res.status(500).json({ message: error.message });
     }
   },
