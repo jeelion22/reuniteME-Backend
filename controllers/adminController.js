@@ -52,8 +52,6 @@ const adminController = {
         return res.status(400).json({ message: "Invalid Credentials" });
       }
 
-      console.log(admin._id);
-
       const token = jwt.sign(
         {
           username: email,
@@ -72,6 +70,7 @@ const adminController = {
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
       console.log(error);
+      res.status(500).json({ message: error.message });
     }
   },
 
