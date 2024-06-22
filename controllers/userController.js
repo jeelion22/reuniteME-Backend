@@ -509,7 +509,7 @@ const userController = {
       const result = await User.aggregate([
         {
           $match: {
-            contribution: { $ne: [] },
+            contributions: { $ne: [] },
           },
         },
         {
