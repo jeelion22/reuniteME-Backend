@@ -17,6 +17,13 @@ adminRouter.get(
   auth.isAdminPermittedToRead,
   adminController.getAllUsers
 );
+
+adminRouter.get(
+  "/users/all-contributions",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToRead,
+  adminController.getAllContributions
+);
 adminRouter.get(
   "/users/:userId",
   auth.isAuthAdmin,
