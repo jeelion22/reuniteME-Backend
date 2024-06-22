@@ -5,6 +5,7 @@ const config = require("../utils/config");
 const bcrypt = require("bcrypt");
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
+const s3 = require("../utils/awsConfig");
 
 const adminController = {
   createAdmin: async function () {
@@ -104,11 +105,72 @@ const adminController = {
   getAllUsers: async (req, res) => {
     try {
       const users = await User.find().select(
-        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires -_id"
+        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -contributions"
       );
       res.status(200).json({ users });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  },
+
+  getAllContributions: async (req, res) => {
+    try {
+      const result = await User.aggregate([
+        {
+          $match: {
+            contributions: { $ne: [] },
+          },
+        },
+        {
+          $unwind: "$contributions",
+        },
+        {
+          $addFields: {
+            "contributions.uploadedBy": {
+              $concat: ["$firstname", " ", "$lastname"],
+            },
+          },
+        },
+
+        {
+          $group: {
+            _id: null,
+            allContributions: {
+              $push: "$contributions",
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            allContributions: 1,
+          },
+        },
+      ]);
+
+      const allContributions = result[0]?.allContributions || [];
+
+      await Promise.all(
+        allContributions.map(async (contribution) => {
+          const params = {
+            Bucket: contribution.bucket,
+            Key: contribution.key,
+            Expires: 60 * 60,
+          };
+
+          const url = await s3.getSignedUrlPromise("getObject", params);
+          contribution["imgUrl"] = url;
+          contribution["fileName"] = contribution.key.split("/")[1]
+        })
+      );
+
+      const contributions = allContributions.map(
+        ({bucket, key, ...rest}) => rest
+      );
+
+      res.status(200).json({ message: contributions });
+    } catch (error) {
+      res.status(500).json(error.message);
     }
   },
 
