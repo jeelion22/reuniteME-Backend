@@ -160,12 +160,12 @@ const adminController = {
 
           const url = await s3.getSignedUrlPromise("getObject", params);
           contribution["imgUrl"] = url;
-          contribution["fileName"] = contribution.key.split("/")[1]
+          contribution["fileName"] = contribution.key.split("/")[1];
         })
       );
 
       const contributions = allContributions.map(
-        ({bucket, key, ...rest}) => rest
+        ({ bucket, key, ...rest }) => rest
       );
 
       res.status(200).json({ message: contributions });
@@ -253,6 +253,70 @@ const adminController = {
       res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  },
+
+  getUsersPlotsInfo: async (req, res) => {
+    try {
+      const usersCreatedAtCount = await User.aggregate([
+        {
+          $project: {
+            accountRegisteredDate: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$accountRegisteredAt",
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$accountRegisteredDate",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: "$_id",
+            count: 1,
+          },
+        },
+        {
+          $sort: { date: 1 },
+        },
+      ]);
+
+      const totalUsersCount = await User.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalActive: {
+              $sum: { $cond: [{ $eq: ["$isActive", true] }, 1, 0] },
+            },
+            totalNonActive: {
+              $sum: { $cond: [{ $eq: ["$isActive", false] }, 1, 0] },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalActive: 1,
+            totalNonActive: 1,
+          },
+        },
+      ]);
+
+      const usersCount = {
+        usersCreatedAtCount,
+        totalActiveUsers: totalUsersCount[0]?.totalActive || 0,
+        totalNonActiveUsers: totalUsersCount[0]?.totalNonActive || 0,
+      };
+
+      res.status(200).json(usersCount);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 };
