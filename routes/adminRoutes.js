@@ -24,6 +24,7 @@ adminRouter.get(
   auth.isAdminPermittedToRead,
   adminController.getAllContributions
 );
+adminRouter.get("/users/plot-info", auth.isAuthAdmin, auth.isAdminPermittedToRead, adminController.getUsersPlotsInfo)
 adminRouter.get(
   "/users/:userId",
   auth.isAuthAdmin,
@@ -42,5 +43,6 @@ adminRouter.delete(
   auth.isAdminPermittedToDelete,
   adminController.deleteUserById
 );
+
 
 module.exports = adminRouter;
