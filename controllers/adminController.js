@@ -308,10 +308,59 @@ const adminController = {
         },
       ]);
 
+      const contributionData = await User.aggregate(
+        [
+          {
+            $match: {
+              contributions: {$ne: []}
+            }
+          },
+          {
+            $unwind: "$contributions"
+          },
+          {
+            $group: {
+              _id: null,
+              allContributions: {
+                $push: "$contributions"
+              }
+            }
+          },
+          {
+            $project: {
+              uploadDate: {
+                $dateToString: {
+                  format: "%Y-%m-%d",
+                  date: "$contributions.uploadDate"
+                }
+              }
+            }
+          },
+          {
+            $group: {
+              _id: "$uploadDate",
+              count: {$sum: 1}
+            }
+          }, {
+            $project: {
+              _id:0,
+              date: "$_id",
+              count: 1
+            }
+          }
+          ,
+          {
+            $sort: {date: 1}
+          }
+        ],
+
+      )
+
       const usersCount = {
         usersCreatedAtCount,
         totalActiveUsers: totalUsersCount[0]?.totalActive || 0,
         totalNonActiveUsers: totalUsersCount[0]?.totalNonActive || 0,
+        contributionData
       };
 
       res.status(200).json(usersCount);
