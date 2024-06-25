@@ -24,7 +24,12 @@ adminRouter.get(
   auth.isAdminPermittedToRead,
   adminController.getAllContributions
 );
-adminRouter.get("/users/plot-info", auth.isAuthAdmin, auth.isAdminPermittedToRead, adminController.getUsersPlotsInfo)
+adminRouter.get(
+  "/users/plot-info",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToRead,
+  adminController.getUsersPlotsInfo
+);
 adminRouter.get(
   "/users/:userId",
   auth.isAuthAdmin,
@@ -44,5 +49,11 @@ adminRouter.delete(
   adminController.deleteUserById
 );
 
+adminRouter.put("/password/reset",  adminController.forgotPassword);
+
+adminRouter.get(
+  "/password/reset/verify/:token", adminController.verifyPasswordResetLink
+);
+adminRouter.put("/password/reset/:userId", adminController.resetPassword)
 
 module.exports = adminRouter;
