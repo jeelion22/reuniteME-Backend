@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const crypto = require("crypto")
 
 const adminSchema = mongoose.Schema({
   username: {
@@ -53,7 +54,7 @@ const adminSchema = mongoose.Schema({
   permissions: {
     type: [
       {
-        type:String,
+        type: String,
         required: true,
         enum: ["read", "write", "delete"],
       },
@@ -76,6 +77,27 @@ const adminSchema = mongoose.Schema({
   lastLogin: {
     type: Date,
   },
+
+  emailVerificationToken: String,
+  emailVerificationTokenExpires: Date,
+  
+
+  isRequestedPasswordReset: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+adminSchema.methods.createEmailVerificationToken = function () {
+  const emailToken = crypto.randomBytes(32).toString("hex");
+  this.emailVerificationToken = crypto
+    .createHash("sha256")
+    .update(emailToken)
+    .digest("hex");
+  this.emailVerificationTokenExpires = new Date(Date.now() + 30 * 60 * 1000);
+
+  return emailToken;
+};
+
 
 module.exports = mongoose.model("Admin", adminSchema, "admins");
