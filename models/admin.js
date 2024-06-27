@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const crypto = require("crypto")
+const crypto = require("crypto");
 
 const adminSchema = mongoose.Schema({
   username: {
@@ -56,7 +56,7 @@ const adminSchema = mongoose.Schema({
       {
         type: String,
         required: true,
-        enum: ["read", "write", "delete"],
+        enum: ["read", "write", "delete", "update"],
       },
     ],
     default: ["read"],
@@ -78,9 +78,12 @@ const adminSchema = mongoose.Schema({
     type: Date,
   },
 
-  emailVerificationToken: String,
-  emailVerificationTokenExpires: Date,
-  
+  emailVerificationToken: {
+    type: String,
+  },
+  emailVerificationTokenExpires: {
+    type: Date,
+  },
 
   isRequestedPasswordReset: {
     type: Boolean,
@@ -98,6 +101,5 @@ adminSchema.methods.createEmailVerificationToken = function () {
 
   return emailToken;
 };
-
 
 module.exports = mongoose.model("Admin", adminSchema, "admins");
