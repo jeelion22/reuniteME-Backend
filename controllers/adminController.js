@@ -6,8 +6,8 @@ const bcrypt = require("bcrypt");
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
 const s3 = require("../utils/awsConfig");
-const sendEmailToVerifyEmail = require("../utils/email")
-const crypto = require("crypto")
+const sendEmailToVerifyEmail = require("../utils/email");
+const crypto = require("crypto");
 
 const adminController = {
   createAdmin: async function () {
@@ -29,6 +29,7 @@ const adminController = {
         email: config.ADMIN_EMAIL_ADDR,
         phone: config.ADMIN_PHONE,
         passwordHash: hashedPassword,
+        permissions: config.ADMIN_PERMISSIONS.split(","),
       });
       await admin.save();
       console.log("Admin created successfully!");
@@ -108,7 +109,6 @@ const adminController = {
       if (!admin) {
         return res.status(400).json({ message: "Admin not found" });
       }
-     
 
       const emailToken = admin.createEmailVerificationToken();
 
@@ -144,6 +144,8 @@ const adminController = {
         .update(token)
         .digest("hex");
 
+      console.log(hashedEmailToken);
+
       const admin = await Admin.findOne({
         emailVerificationToken: hashedEmailToken,
         emailVerificationTokenExpires: { $gt: Date.now() },
@@ -175,7 +177,7 @@ const adminController = {
     try {
       const { password } = req.body;
 
-      const adminId = req.params.userId;
+      const adminId = req.params.adminId;
 
       const admin = await Admin.findOne({
         _id: adminId,
@@ -311,31 +313,40 @@ const adminController = {
         return res.status(400).json({ message: "Invalid user id" });
       }
 
-      const { firstname, lastname, userCategory } = req.body;
-
       const user = await User.findById(userId);
 
       if (!user) {
         return res.status(400).json({ message: "User not found" });
       }
-      if (firstname) {
-        user.firstname = firstname;
-      }
-      if (lastname) {
-        user.lastname = lastname;
-      }
+      if (["reuniteSeeker", "both"].includes(user.userCategory)) {
+        user.firstname = req.body.firstname;
+        user.lastname = req.body.lastname;
+        user.phone = req.body.phone;
+        user.address = req.body.address;
+        user.authorizedIdType = req.body.authorizedIdType;
+        user.authorizedIdNo = req.body.authorizedIdNo;
 
-      if (userCategory) {
-        user.usercategory = userCategory;
+        await user.save();
+
+        return res.status(200).json({
+          message: "User's profile information updated successfully!",
+        });
+      } else {
+        user.firstname = req.body.firstname;
+        user.lastname = req.body.lastname;
+        user.phone = req.body.phone;
+
+        await user.save();
+
+        return res.status(200).json({
+          message: "User's profile information updated successfully!",
+        });
       }
-
-      await user.save();
-
-      res.status(200).json({ message: "User updated successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   },
+
   deleteUserById: async (req, res) => {
     try {
       const userId = req.params.userId;
@@ -358,8 +369,31 @@ const adminController = {
       } else {
         res.status(200).json({ message: "Account was already deleted" });
       }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 
-      res.status(200).json({ message: "User deleted successfully" });
+  activateUser: async (req, res) => {
+    try {
+      const userId = req.params.userId;
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (user.isEmailVerified && !user.isActive) {
+        user.isActive = true;
+        await user.save();
+
+        return res
+          .status(200)
+          .json({ message: "User activated successfully!" });
+      } else {
+        return res.status(400).json({message: "User can not be activated"})
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
