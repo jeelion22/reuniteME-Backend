@@ -37,7 +37,7 @@ adminRouter.get(
   adminController.getUserById
 );
 adminRouter.put(
-  "/users/:userId",
+  "/users/update/:userId",
   auth.isAuthAdmin,
   auth.isAdminPermittedToUpdate,
   adminController.updateUserById
@@ -49,11 +49,19 @@ adminRouter.delete(
   adminController.deleteUserById
 );
 
-adminRouter.put("/password/reset",  adminController.forgotPassword);
+adminRouter.get(
+  "/users/activate/:userId",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToUpdate,
+  adminController.activateUser
+);
+
+adminRouter.put("/password/reset", adminController.forgotPassword);
 
 adminRouter.get(
-  "/password/reset/verify/:token", adminController.verifyPasswordResetLink
+  "/password/reset/verify/:token",
+  adminController.verifyPasswordResetLink
 );
-adminRouter.put("/password/reset/:userId", adminController.resetPassword)
+adminRouter.put("/password/reset/:adminId", adminController.resetPassword);
 
 module.exports = adminRouter;
