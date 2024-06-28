@@ -44,7 +44,9 @@ const adminController = {
       const admin = await Admin.findOne({ email, status: "active" });
 
       if (!admin) {
-        return res.status(400).json({ message: "Invalid credentials." });
+        return res
+          .status(400)
+          .json({ message: "Invalid credentials or account may be deleted." });
       }
 
       const isPasswordCorrect = await bcrypt.compare(
@@ -392,7 +394,7 @@ const adminController = {
           .status(200)
           .json({ message: "User activated successfully!" });
       } else {
-        return res.status(400).json({message: "User can not be activated"})
+        return res.status(400).json({ message: "User can not be activated" });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -535,6 +537,95 @@ const adminController = {
       res.status(200).json(usersCount);
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+  },
+
+  createAdminByRootAdmin: async (req, res) => {
+    try {
+      const newAdminData = req.body;
+
+      const admin = await Admin.findOne({
+        username: newAdminData.username,
+        email: newAdminData.email,
+      });
+
+      if (admin) {
+        return res.status(400).json({ message: "Admin already exists" });
+      }
+
+      const hashedPassword = await bcrypt.hash(newAdminData.password, 10);
+
+      newAdminData["passwordHash"] = hashedPassword;
+
+      const newAdmin = new Admin(newAdminData);
+
+      await newAdmin.save();
+
+      res.status(201).json({ message: "Admin created successfully!" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  getAllAdmins: async (req, res) => {
+    try {
+      const allAdmins = await Admin.find().select(
+        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -contributions"
+      );
+      res.status(200).json(allAdmins);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  updateAdmin: async (req, res) => {
+    try {
+      const adminId = req.params.adminId;
+
+      const adminData = req.body;
+
+      const admin = await Admin.findOne({ _id: adminId });
+
+      if (!admin) {
+        return res.status(400).json({ message: "Admin not found" });
+      }
+
+      admin.username = adminData.username;
+      admin.firstname = adminData.firstname;
+      admin.lastname = adminData.lastname;
+      admin.email = adminData.email;
+      admin.phone = adminData.phone;
+      admin.role = adminData.role;
+      admin.permissions = adminData.permissions;
+      admin.status = adminData.status;
+
+      await admin.save();
+
+      res
+        .status(200)
+        .json({ message: "Admin information updated successfully!" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  deleteAdmin: async (req, res) => {
+    try {
+      const adminId = req.params.adminId;
+
+      const admin = await Admin.findOne({
+        _id: adminId,
+        status: { $ne: "deleted" },
+      });
+
+      if (!admin) {
+        return res.status(400).json({ message: "Admin was already deleted" });
+      }
+
+      admin.status = "deleted";
+      await admin.save();
+
+      res.status(204).json({ message: "Admin was deleted successfully!" });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   },
 };
