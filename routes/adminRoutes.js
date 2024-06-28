@@ -64,4 +64,38 @@ adminRouter.get(
 );
 adminRouter.put("/password/reset/:adminId", adminController.resetPassword);
 
+adminRouter.post(
+  "/create-admin",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToUpdate,
+  auth.isAdminPermittedToDelete,
+  adminController.createAdminByRootAdmin
+);
+
+adminRouter.get(
+  "/get-all-admins",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToUpdate,
+  auth.isAdminPermittedToDelete,
+  adminController.getAllAdmins
+);
+
+adminRouter.put(
+  "/update/admin/:adminId",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToDelete,
+  auth.isAdminPermittedToUpdate,
+
+  adminController.updateAdmin
+);
+
+adminRouter.delete(
+  "/delete/admin/:adminId",
+  auth.isAuthAdmin,
+  auth.isAdminPermittedToDelete,
+  auth.isAdminPermittedToUpdate,
+  auth.isAdminPermittedToRead,
+  adminController.deleteAdmin
+);
+
 module.exports = adminRouter;
