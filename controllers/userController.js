@@ -191,7 +191,7 @@ const userController = {
       const userId = req.userId;
 
       const user = await User.findOne({ _id: userId, isActive: true }).select(
-        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -whoDeleted"
+        "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -whoDeleted -key"
       );
 
       if (!user) {
@@ -271,12 +271,10 @@ const userController = {
 
       console.log(userId);
 
-      res
-        .status(200)
-        .json({
-          message: "Your account verified successfully!",
-          redirectTo: userId,
-        });
+      res.status(200).json({
+        message: "Your account verified successfully!",
+        redirectTo: userId,
+      });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -334,11 +332,9 @@ const userController = {
 
         await user.save();
 
-        return res
-          .status(200)
-          .json({
-            message: "User's profile information updated successfully!",
-          });
+        return res.status(200).json({
+          message: "User's profile information updated successfully!",
+        });
       } else {
         user.firstname = req.body.firstname;
         user.lastname = req.body.lastname;
@@ -346,35 +342,10 @@ const userController = {
 
         await user.save();
 
-        return res
-          .status(200)
-          .json({
-            message: "User's profile information updated successfully!",
-          });
+        return res.status(200).json({
+          message: "User's profile information updated successfully!",
+        });
       }
-
-      // let updatedUser;
-
-      // if (phone && phone != user.phone) {
-      //   if (user.prevPhones) {
-      //     user.prevPhones.push(user.phone);
-      //     user.phone = phone;
-      //     updatedUser = await user.save();
-      //   } else {
-      //     user.prevPhones = [];
-      //     user.prevPhones.push(user.phone);
-      //     user.phone = phone;
-      //     updatedUser = await user.save();
-      //   }
-
-      //   res
-      //     .status(200)
-      //     .json({ message: `Phone number ${phone} updated successfully` });
-      // } else {
-      //   res
-      //     .status(200)
-      //     .json({ message: `Phone number ${phone} already exists.` });
-      // }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -465,13 +436,14 @@ const userController = {
       try {
         const s3Data = await s3.upload(params).promise();
 
-        const updatedUser = await User.findOneAndUpdate(
+        await User.findOneAndUpdate(
           { _id: userId },
           {
             $push: {
               contributions: {
                 bucket: bucketName,
                 key: s3Data.Key,
+                fileName: s3Data.Key.split("/")[1],
                 fileType: mimetype,
                 fileSize: size,
                 location: { latitude, longitude },
