@@ -13,13 +13,13 @@ const morgan = require("morgan");
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://reuniteme.netlify.app",
     credentials: true,
   })
 );
 
 app.use((req, res, next) => {
-  req.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  req.header("Access-Control-Allow-Origin", "https://reuniteme.netlify.app");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
