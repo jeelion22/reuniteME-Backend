@@ -18,44 +18,65 @@ const userController = {
   register: async (req, res) => {
     try {
       const email = req.body.email;
+      const phone = req.body.phone;
 
-      const user = await User.findOne({ email });
+      let checkUniquePhone;
+      let checkUniqueEmail;
+
+      const user = await User.findOne({ email, phone });
+
+      if (!user) {
+        checkUniquePhone = await User.findOne({ phone });
+        checkUniqueEmail = await User.findOne({ email });
+        if (checkUniquePhone || checkUniqueEmail) {
+          return res
+            .status(400)
+            .json({ message: "Either Phone number or email is not unique." });
+        }
+      }
 
       if (user.isEmailVerified && !user.isActive) {
-        return res
-          .status(400)
-          .json({ message: "Account does not exist or might be deleted." });
+        return res.status(400).json({ message: "Account might be deleted." });
       }
 
-      if (user) {
-        return res.status(400).json({
-          message: user.isEmailVerified
-            ? "User already exists"
-            : "Your account is not verified!",
-        });
+      if (user.isEmailVerified) {
+        return res.status(400).json({ message: "User already exists." });
       }
 
-      const newUser = new User(req.body);
+      let newUser;
+      let emailToken;
 
-      const emailToken = newUser.createEmailVerificationToken();
+      if (!user.isEmailVerified && !user.isActive) {
+        emailToken = user.createEmailVerificationToken();
+        await user.save();
+      } else {
+        newUser = new User(req.body);
+        emailToken = newUser.createEmailVerificationToken();
 
-      await newUser.save();
+        await newUser.save();
+      }
 
       const verificationURL = `${req.protocol}://localhost:5173/users/verify/${emailToken}`;
       const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
 
-      await sendEmailToVerifyEmail({
-        email: newUser.email,
-        subject: "Verify your ReUniteME account",
-        message: message,
-      });
-
-      await newUser.save();
+      user
+        ? await sendEmailToVerifyEmail({
+            email: user.email,
+            subject: "Verify your ReUniteME account",
+            message: message,
+          })
+        : await sendEmailToVerifyEmail({
+            email: newUser.email,
+            subject: "Verify your ReUniteME account",
+            message: message,
+          }),
+        user ? await user.save() : await newUser.save();
 
       res.status(201).json({
         status: "success",
-        message:
-          "User created successfully. Please verify your account by the link sent to your email",
+        message: `${
+          newUser ? "User created successfully." : ""
+        }Please verify your account by the link sent to your email`,
       });
     } catch (error) {
       console.log(error);
