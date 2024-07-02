@@ -56,7 +56,7 @@ const userController = {
         await newUser.save();
       }
 
-      const verificationURL = `${req.protocol}://localhost:5173/users/verify/${emailToken}`;
+      const verificationURL = `https://reuniteme.netlify.app/users/verify/${emailToken}`;
       const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
 
       user
