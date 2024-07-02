@@ -24,6 +24,7 @@ const contributionShema = new mongoose.Schema({
   bucket: String,
   key: String,
   uploadDate: { type: Date, default: Date.now },
+  fileName: String,
   fileType: String,
   fileSize: Number,
   location: { latitude: Number, longitude: Number },
