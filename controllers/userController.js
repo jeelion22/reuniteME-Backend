@@ -33,20 +33,20 @@ const userController = {
             .status(400)
             .json({ message: "Either Phone number or email is not unique." });
         }
-      }
+      } else {
+        if (user.isEmailVerified && !user.isActive) {
+          return res.status(400).json({ message: "Account might be deleted." });
+        }
 
-      if (user?.isEmailVerified && !user.isActive) {
-        return res.status(400).json({ message: "Account might be deleted." });
-      }
-
-      if (user?.isEmailVerified) {
-        return res.status(400).json({ message: "User already exists." });
+        if (user?.isEmailVerified) {
+          return res.status(400).json({ message: "User already exists." });
+        }
       }
 
       let newUser;
       let emailToken;
 
-      if (!user.isEmailVerified && !user.isActive) {
+      if (user && !user.isEmailVerified && !user.isActive) {
         emailToken = user.createEmailVerificationToken();
         await user.save();
       } else {
