@@ -17,11 +17,15 @@ const exifParser = require("exif-parser");
 const userController = {
   register: async (req, res) => {
     try {
-      // const { firstname, lastname, email, phone } = req.body;
-
       const email = req.body.email;
 
       const user = await User.findOne({ email });
+
+      if (user.isEmailVerified && !user.isActive) {
+        return res
+          .status(400)
+          .json({ message: "Account does not exist or might be deleted." });
+      }
 
       if (user) {
         return res.status(400).json({
@@ -31,16 +35,7 @@ const userController = {
         });
       }
 
-      const newUser = new User(
-        //   {
-        //   firstname,
-        //   lastname,
-        //   email,
-        //   phone,
-        // }
-
-        req.body
-      );
+      const newUser = new User(req.body);
 
       const emailToken = newUser.createEmailVerificationToken();
 
