@@ -35,11 +35,11 @@ const userController = {
         }
       }
 
-      if (user.isEmailVerified && !user.isActive) {
+      if (user?.isEmailVerified && !user.isActive) {
         return res.status(400).json({ message: "Account might be deleted." });
       }
 
-      if (user.isEmailVerified) {
+      if (user?.isEmailVerified) {
         return res.status(400).json({ message: "User already exists." });
       }
 
