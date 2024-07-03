@@ -116,6 +116,7 @@ const userController = {
       user.isEmailVerified = true;
 
       user.emailVerificationToken = undefined;
+      user.emailVerificationTokenExpires = undefined;
       await user.save();
 
       const userId = user._id.toString();
