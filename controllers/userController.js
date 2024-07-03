@@ -34,11 +34,11 @@ const userController = {
             .json({ message: "Either Phone number or email is not unique." });
         }
       } else {
-        if (user.isEmailVerified && !user.isActive) {
+        if (user.isEmailVerified && user.isPasswordSet && !user.isActive) {
           return res.status(400).json({ message: "Account might be deleted." });
         }
 
-        if (user?.isEmailVerified) {
+        if (user.isEmailVerified && user.isPasswordSet && user.isActive) {
           return res.status(400).json({ message: "User already exists." });
         }
       }
@@ -114,7 +114,7 @@ const userController = {
       }
 
       user.isEmailVerified = true;
-      user.isActive = true;
+
       user.emailVerificationToken = undefined;
       await user.save();
 
@@ -125,7 +125,6 @@ const userController = {
 
         redirectTo: `create-password/${userId}`,
       });
-      console.log(userId);
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
@@ -153,6 +152,8 @@ const userController = {
       const passwordHash = await bcrypt.hash(password, 10);
 
       user.passwordHash = passwordHash;
+      user.isActive = true;
+      user.isPasswordSet = true;
 
       await user.save();
 
