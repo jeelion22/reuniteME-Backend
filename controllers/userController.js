@@ -166,7 +166,8 @@ const userController = {
 
   login: async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email } = req.body.email;
+      const { password } = req.body.password;
 
       console.log(email, password);
 
