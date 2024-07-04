@@ -22,7 +22,7 @@ userRouter.post("/login", userController.login);
 userRouter.get("/me", auth.isAuth, userController.me);
 userRouter.put("/me", auth.isAuth, userController.update);
 userRouter.delete("/me", auth.isAuth, userController.delete);
-userRouter.post("/logout", auth.isAuth, userController.logout);
+userRouter.get("/logout", auth.isAuth, userController.logout);
 userRouter.post(
   "/upload",
   auth.isAuth,

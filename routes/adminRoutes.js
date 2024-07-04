@@ -8,7 +8,7 @@ const adminRouter = express.Router();
 // admin endpoints
 adminRouter.post("/login", adminController.login);
 adminRouter.get("/me", auth.isAuthAdmin, adminController.me);
-adminRouter.post("/logout", auth.isAuthAdmin, adminController.logout);
+adminRouter.get("/logout", auth.isAuthAdmin, adminController.logout);
 
 // end points for accessing users information
 adminRouter.get(

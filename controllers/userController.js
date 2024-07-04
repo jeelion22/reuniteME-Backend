@@ -197,8 +197,6 @@ const userController = {
         return res.status(400).json({ message: "Invalid Credentials." });
       }
 
-      console.log(JWT_SECRET);
-
       const token = jwt.sign(
         {
           id: user._id,
@@ -206,17 +204,15 @@ const userController = {
         JWT_SECRET
       );
 
-      console.log(token);
-
       res.cookie("token", token, {
         path: "/",
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
-        domain: "reuniteme.netlify.app",
+        // domain: "reuniteme.netlify.app",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
-      res.status(200).json({ message: "login successful" });
+      res.status(200).json({ message: "login successful", token });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

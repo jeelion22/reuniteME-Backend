@@ -19,7 +19,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-  req.header("Access-Control-Allow-Origin", "https://reuniteme.netlify.app");
+  req.header("Access-Control-Allow-Origin", "https://reuniteme.netlify.app",);
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
