@@ -200,7 +200,7 @@ const userController = {
       const token = jwt.sign(
         {
           username: email,
-          id: user._id,
+          id: user._id.toString(),
           name: user.firstname,
         },
         JWT_SECRET
