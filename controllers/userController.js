@@ -168,10 +168,20 @@ const userController = {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email, isActive: true });
+      const user = await User.findOne({ email });
+
 
       if (!user) {
         return res.status(400).json({ message: "Invalid Credentials." });
+      }
+
+
+      if (user.isPasswordSet && !user.isActive && user.isAccountDeleted) {
+        return res.status(400).json({message: "Your account might be deleted."})
+      }
+
+      if (!user.isActive && !user.isPasswordSet) {
+        return res.status(400).json({message: "Your account is not verified."})
       }
 
       const isPasswordCorrect = await bcrypt.compare(
