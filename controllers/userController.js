@@ -215,7 +215,7 @@ const userController = {
         domain: "reuniteme.netlify.app",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
-      res.status(200).json({ message: "login successful", token });
+      res.status(200).json({ message: "login successful" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
