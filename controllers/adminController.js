@@ -114,7 +114,7 @@ const adminController = {
 
       const emailToken = admin.createEmailVerificationToken();
 
-      const verificationURL = `${req.protocol}://localhost:5173/admins/password/reset/verify/${emailToken}`;
+      const verificationURL = `https://reuniteme.netlify.app/admins/password/reset/verify/${emailToken}`;
 
       const message = `Please use the link below to reset the password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
 
