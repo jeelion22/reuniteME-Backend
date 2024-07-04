@@ -414,12 +414,7 @@ const userController = {
 
   logout: async (req, res) => {
     try {
-      res.clearCookie("token", {
-        path: "/",
-        secure: true,
-        sameSite: "Strict",
-        domain: "reuniteme.netlify.app",
-      });
+      res.clearCookie("token");
 
       res.status(204).send();
     } catch (error) {
