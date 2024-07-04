@@ -423,7 +423,7 @@ const userController = {
         domain: "reuniteme.netlify.app",
       });
 
-      res.status(200).json({ message: "logout successful!" });
+      res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
