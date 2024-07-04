@@ -199,10 +199,7 @@ const userController = {
 
       const token = jwt.sign(
         {
-          username: email,
           id: user._id,
-       
-          iat: Math.floor(Date.now() / 1000),
         },
         JWT_SECRET
       );
@@ -223,7 +220,6 @@ const userController = {
   me: async (req, res) => {
     try {
       const userId = req.userId;
-      
 
       const user = await User.findOne({ _id: userId, isActive: true }).select(
         "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -whoDeleted -key"
