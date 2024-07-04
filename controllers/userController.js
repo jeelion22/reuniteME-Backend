@@ -201,7 +201,7 @@ const userController = {
         {
           username: email,
           id: user._id,
-          name: user.firstname,
+       
           iat: Math.floor(Date.now() / 1000),
         },
         JWT_SECRET
