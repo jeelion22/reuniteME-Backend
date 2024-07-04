@@ -207,9 +207,10 @@ const userController = {
       );
 
       res.cookie("token", token, {
+        path: "/",
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "Strict",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
       res.status(200).json({ message: "login successful", token });
