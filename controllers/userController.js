@@ -204,6 +204,8 @@ const userController = {
         JWT_SECRET
       );
 
+      console.log(token);
+
       res.cookie("token", token, {
         path: "/",
         httpOnly: true,
