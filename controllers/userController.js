@@ -166,10 +166,7 @@ const userController = {
 
   login: async (req, res) => {
     try {
-      const { email } = req.body.email;
-      const { password } = req.body.password;
-
-      console.log(email, password);
+      const { email, password } = req.body;
 
       const user = await User.findOne({ email });
 
