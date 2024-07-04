@@ -200,7 +200,7 @@ const userController = {
       const token = jwt.sign(
         {
           username: email,
-          id: user._id.toString(),
+          id: user._id,
           name: user.firstname,
           iat: Math.floor(Date.now() / 1000),
         },
