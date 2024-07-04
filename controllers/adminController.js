@@ -146,8 +146,6 @@ const adminController = {
         .update(token)
         .digest("hex");
 
-      console.log(hashedEmailToken);
-
       const admin = await Admin.findOne({
         emailVerificationToken: hashedEmailToken,
         emailVerificationTokenExpires: { $gt: Date.now() },
