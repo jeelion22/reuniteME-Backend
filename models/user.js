@@ -113,7 +113,13 @@ const userSchema = mongoose.Schema({
     required: true,
     default: false,
   },
-  
+
+  isAccountDeleted: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+
   accountRegisteredAt: { type: Date, default: Date.now },
   accountDeletetedAt: {
     type: Date,
