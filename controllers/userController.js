@@ -211,7 +211,7 @@ const userController = {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
-        domain: "https://reuniteme.netlify.app",
+        domain: "reuniteme.netlify.app",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
       res.status(200).json({ message: "login successful", token });
@@ -420,7 +420,7 @@ const userController = {
         path: "/",
         secure: true,
         sameSite: "Strict",
-        domain: "https://reuniteme.netlify.app",
+        domain: "reuniteme.netlify.app",
       });
 
       res.status(200).json({ message: "logout successful!" });
