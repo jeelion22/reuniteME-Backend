@@ -59,18 +59,21 @@ const userController = {
       const verificationURL = `https://reuniteme.netlify.app/users/verify/${emailToken}`;
       const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
 
-      user
-        ? await sendEmailToVerifyEmail({
-            email: user.email,
-            subject: "Verify your ReUniteME account",
-            message: message,
-          })
-        : await sendEmailToVerifyEmail({
-            email: newUser.email,
-            subject: "Verify your ReUniteME account",
-            message: message,
-          }),
-        user ? await user.save() : await newUser.save();
+      if (user) {
+        await sendEmailToVerifyEmail({
+          email: user.email,
+          subject: "Verify your ReUniteME account",
+          message: message,
+        });
+        await user.save();
+      } else {
+        await sendEmailToVerifyEmail({
+          email: newUser.email,
+          subject: "Verify your ReUniteME account",
+          message: message,
+        });
+        await newUser.save();
+      }
 
       res.status(201).json({
         status: "success",
@@ -81,8 +84,7 @@ const userController = {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        message:
-          "There was an error processing your request. Please try again later.",
+        message: error.message,
       });
     }
   },
