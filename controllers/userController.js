@@ -197,6 +197,8 @@ const userController = {
         return res.status(400).json({ message: "Invalid Credentials." });
       }
 
+      console.log(JWT_SECRET);
+
       const token = jwt.sign(
         {
           id: user._id,
