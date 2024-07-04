@@ -109,7 +109,7 @@ const userController = {
           .json({ message: "Invalid link or it has expired" });
       }
 
-      if (user.isEmailVerified && !user.isPasswordSet) {
+      if (user.isEmailVerified && user.isPasswordSet) {
         return res
           .status(200)
           .json({ message: "Your email verification already completed." });
