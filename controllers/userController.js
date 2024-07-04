@@ -46,7 +46,7 @@ const userController = {
       let newUser;
       let emailToken;
 
-      if (user && !user.isEmailVerified && !user.isActive) {
+      if (user && !user.isActive && !user.isAccountDeleted) {
         emailToken = user.createEmailVerificationToken();
         await user.save();
       } else {
