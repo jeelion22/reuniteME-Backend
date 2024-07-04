@@ -361,10 +361,11 @@ const adminController = {
 
       if (user.isActive) {
         user.isActive = false;
-        user.whoDeleted.push({
-          userId: config.username,
-          role: "Admin",
-        });
+        (user.isAccountDeleted = true),
+          user.whoDeleted.push({
+            userId: config.username,
+            role: "Admin",
+          });
         await user.save();
 
         res.status(204).json({ message: "User deleted successfully!" });
@@ -386,8 +387,9 @@ const adminController = {
         return res.status(400).json({ message: "User not found" });
       }
 
-      if (user.isEmailVerified && !user.isActive) {
+      if (user.isEmailVerified && !user.isActive && user.isAccountDeleted) {
         user.isActive = true;
+        user.isAccountDeleted = false;
         await user.save();
 
         return res
