@@ -436,6 +436,12 @@ const userController = {
         return res.status(400).json({ message: "User not found" });
       }
 
+      if (user.userCategory !== "communityUploader") {
+        return res
+          .status(400)
+          .json({ message: "You are not authorized to upload!" });
+      }
+
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
