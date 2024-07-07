@@ -37,13 +37,14 @@ userRouter.get(
   userController.getPresignedImageUrl
 );
 
-userRouter.get(
+userRouter.delete(
   "/images/delete/:imageId",
   auth.isAuth,
   userController.deleteUploadedImage
 );
 
 userRouter.get("/maps/:imageId", auth.isAuth, userController.getLocation);
+
 userRouter.put(
   "/update/:contributionId",
   upload.single("file"),
