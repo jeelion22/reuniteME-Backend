@@ -806,10 +806,13 @@ const userController = {
 
       const imageId = req.params.imageId;
 
-      const user = await User.findById(userId);
+      const user = await User.findOne({
+        _id: userId,
+        userCategory: "communityUploader",
+      });
 
       if (!user) {
-        return res.status(400).json({ message: "User not found" });
+        return res.status(400).json({ message: "Unauthorized!" });
       }
 
       const contributionIndex = user.contributions.findIndex(
