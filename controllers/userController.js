@@ -823,6 +823,16 @@ const userController = {
 
       const user = await User.findById(userId);
 
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      if (user && user.userCategory !== "communityUploader") {
+        return res
+          .status(400)
+          .json({ message: "You are not authorized to update contributions." });
+      }
+
       const contribution = user.contributions.find(
         (contribution) => contribution._id.toString() == contributionId
       );
