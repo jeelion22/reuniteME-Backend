@@ -381,39 +381,39 @@ const userController = {
       res.status(500).json({ message: error.message });
     }
   },
-  delete: async (req, res) => {
-    try {
-      const userId = req.userId;
+  // delete: async (req, res) => {
+  //   try {
+  //     const userId = req.userId;
 
-      const user = await User.findById(userId);
+  //     const user = await User.findById(userId);
 
-      if (!user) {
-        return res.status(400).json({ message: "User not found" });
-      }
+  //     if (!user) {
+  //       return res.status(400).json({ message: "User not found" });
+  //     }
 
-      if (user.isActive && !user.isAccountDeleted) {
-        user.isActive = false;
-        user.isAccountDeleted = true;
+  //     if (user.isActive && !user.isAccountDeleted) {
+  //       user.isActive = false;
+  //       user.isAccountDeleted = true;
 
-        user.whoDeleted.push({
-          userId: userId,
-          role: "User",
-        });
+  //       user.whoDeleted.push({
+  //         userId: userId,
+  //         role: "User",
+  //       });
 
-        await user.save();
+  //       await user.save();
 
-        res.clearCookie("token");
+  //       res.clearCookie("token");
 
-        res.status(204).json({ message: "User deleted successfully!" });
-      } else if (!user.isActive && user.isAccountDeleted) {
-        res.status(200).json({ message: "Account was already deleted" });
-      } else {
-        res.status(200).json({ message: "Invalid operation" });
-      }
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+  //       res.status(204).json({ message: "User deleted successfully!" });
+  //     } else if (!user.isActive && user.isAccountDeleted) {
+  //       res.status(200).json({ message: "Account was already deleted" });
+  //     } else {
+  //       res.status(200).json({ message: "Invalid operation" });
+  //     }
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
 
   logout: async (req, res) => {
     try {
