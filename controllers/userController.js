@@ -620,6 +620,14 @@ const userController = {
         return res.status(400).json({ message: "User not found" });
       }
 
+      if (user.userCategory !== "communityUploader") {
+        return res
+          .status(400)
+          .json({
+            message: "You are not an authorized user to delete contributions.",
+          });
+      }
+
       const contributionIndex = user.contributions.findIndex(
         (contribution) => contribution._id.toString() === imageId
       );
