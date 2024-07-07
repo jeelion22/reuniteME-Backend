@@ -621,11 +621,9 @@ const userController = {
       }
 
       if (user.userCategory !== "communityUploader") {
-        return res
-          .status(400)
-          .json({
-            message: "You are not an authorized user to delete contributions.",
-          });
+        return res.status(400).json({
+          message: "You are not an authorized user to delete contributions.",
+        });
       }
 
       const contributionIndex = user.contributions.findIndex(
@@ -701,6 +699,14 @@ const userController = {
         });
       }
 
+      const isContribution = await Visitors.findOne({
+        contributionId: contributionId,
+      });
+
+      if (!isContribution) {
+        return res.status(400).json({ message: "Invalid contribution id." });
+      }
+
       let contribution = await Visitors.findOne({
         contributionId: contributionId,
         visitorsId: userId,
@@ -719,7 +725,7 @@ const userController = {
 
       res.status(200).json({ message: contribution });
     } catch (error) {
-      console.log(error);
+      res.status(500).json({ message: error.message });
     }
   },
 
@@ -784,7 +790,6 @@ const userController = {
 
       res.status(200).json({ message: "-Status updated successfully!" });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ message: error.message });
     }
   },
