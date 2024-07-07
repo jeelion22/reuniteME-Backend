@@ -723,9 +723,13 @@ const userController = {
         });
       }
 
-      res.status(200).json({
-        message: contribution,
-      });
+      if (!contribution) {
+        return res.status(400).json({ message: "Forbidden" });
+      } else {
+        res.status(200).json({
+          message: contribution,
+        });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
