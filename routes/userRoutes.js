@@ -21,7 +21,7 @@ userRouter.post("/login", userController.login);
 // protected routes
 userRouter.get("/me", auth.isAuth, userController.me);
 userRouter.put("/me", auth.isAuth, userController.update);
-userRouter.delete("/me", auth.isAuth, userController.delete);
+// userRouter.delete("/me", auth.isAuth, userController.delete);
 userRouter.get("/logout", auth.isAuth, userController.logout);
 userRouter.post(
   "/upload",
