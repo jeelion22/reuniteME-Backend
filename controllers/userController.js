@@ -136,7 +136,7 @@ const userController = {
 
   createPassword: async (req, res) => {
     try {
-      const { password } = req.body.password;
+      const { password } = req.body;
 
       const userId = req.params.userId;
 
