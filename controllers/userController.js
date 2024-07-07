@@ -796,7 +796,7 @@ const userController = {
 
       await contribution.save();
 
-      res.status(200).json({ message: "-Status updated successfully!" });
+      res.status(200).json({ message: "Status updated successfully!" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
