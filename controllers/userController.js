@@ -598,7 +598,6 @@ const userController = {
 
       res.status(200).json({ url });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -636,9 +635,8 @@ const userController = {
 
       await user.save();
 
-      res.status(200).json({ message: "Image deleted successfully!" });
+      res.status(204).json({ message: "Image deleted successfully!" });
     } catch (error) {
-      console.log(error);
       res.status(500).json({ message: error.message });
     }
   },
