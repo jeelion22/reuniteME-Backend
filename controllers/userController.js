@@ -391,8 +391,9 @@ const userController = {
         return res.status(400).json({ message: "User not found" });
       }
 
-      if (user.isActive) {
+      if (user.isActive && !user.isAccountDeleted) {
         user.isActive = false;
+        user.isAccountDeleted = true;
 
         user.whoDeleted.push({
           userId: userId,
@@ -404,8 +405,10 @@ const userController = {
         res.clearCookie("token");
 
         res.status(204).json({ message: "User deleted successfully!" });
-      } else {
+      } else if (!user.isActive && user.isAccountDeleted) {
         res.status(200).json({ message: "Account was already deleted" });
+      } else {
+        res.status(200).json({ message: "Invalid operation" });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
