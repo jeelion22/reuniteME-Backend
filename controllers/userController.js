@@ -723,7 +723,15 @@ const userController = {
         });
       }
 
-      res.status(200).json({ message: contribution });
+      res
+        .status(200)
+        .json({
+          message: {
+            status: contribution.status,
+            checking: contribution.checking,
+            visitorsId: contribution.visitorsId,
+          },
+        });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
