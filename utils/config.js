@@ -9,12 +9,6 @@ const EMAIL_HOST = process.env.EMAIL_HOST;
 const EMAIL_PORT = process.env.EMAIL_PORT;
 const EMAIL_USERNAME = process.env.EMAIL_USERNAME;
 const EMAIL_PWD = process.env.EMAIL_PWD;
-const TWILIO_ACCOUNTSID = process.env.TWILIO_ACCOUNTSID;
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
-const TWILIO_SERVICES = process.env.TWILIO_SERVICES;
-const VONAGE_API_KEY = process.env.VONAGE_API_KEY;
-const VONAGE_API_SECRET = process.env.VONAGE_API_SECRET;
 const TOKEN_EXPIRES = process.env.TOKEN_EXPIRES;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_FIRST_NAME = process.env.ADMIN_FIRST_NAME;
@@ -27,9 +21,8 @@ const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 const AWS_REGION = process.env.AWS_REGION;
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
-const GOOGLE_MAP_API_KEY = process.env.GOOGLE_MAP_API_KEY;
-const GOOGLE_MAP_VERSION = process.env.GOOGLE_MAP_VERSION;
-const ADMIN_PERMISSIONS = process.env.ADMIN_PERMISSIONS
+
+const ADMIN_PERMISSIONS = process.env.ADMIN_PERMISSIONS;
 
 // export all these configuration variables
 module.exports = {
@@ -41,12 +34,7 @@ module.exports = {
   EMAIL_PORT,
   EMAIL_USERNAME,
   EMAIL_PWD,
-  TWILIO_ACCOUNTSID,
-  TWILIO_AUTH_TOKEN,
-  TWILIO_PHONE_NUMBER,
-  TWILIO_SERVICES,
-  VONAGE_API_KEY,
-  VONAGE_API_SECRET,
+
   ADMIN_USERNAME,
   ADMIN_USERNAME,
   ADMIN_FIRST_NAME,
@@ -60,6 +48,4 @@ module.exports = {
   AWS_REGION,
   AWS_ACCESS_KEY,
   AWS_SECRET_ACCESS_KEY,
-  GOOGLE_MAP_API_KEY,
-  GOOGLE_MAP_VERSION,
 };
