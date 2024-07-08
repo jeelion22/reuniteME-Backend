@@ -2,7 +2,7 @@ const User = require("../models/user");
 const Visitors = require("../models/reuniteSeekerLogs");
 const sendEmailToVerifyEmail = require("../utils/email");
 const crypto = require("crypto");
-const sendOTP = require("../utils/sendOTP");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {
