@@ -206,7 +206,7 @@ const adminController = {
 
   logout: async (req, res) => {
     try {
-      res.clearCookie("token");
+      res.clearCookie("token", {httpOnly: true, secure: true, sameSite: 'None'});
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: error.message });
