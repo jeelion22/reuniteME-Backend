@@ -1,6 +1,6 @@
 # ReUniteME (BackEnd)
 
-This repository defines API endpoints for the ReuniteME platform, a web-based application designed to facilitate the reunion of mentally ill individuals and individuals in endangered situations with their families.
+This repository defines API endpoints for the ReuniteME platform, a web-based application designed to facilitate the reunion of person with mental health issues and individuals in endangered situations with their families.
 
 ## Table of Contents
 
