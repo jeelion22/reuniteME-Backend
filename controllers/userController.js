@@ -417,7 +417,11 @@ const userController = {
 
   logout: async (req, res) => {
     try {
-      res.clearCookie("token", {httpOnly: true, secure: true, sameSite: 'None'});
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
 
       res.status(204).send();
     } catch (error) {
@@ -699,13 +703,13 @@ const userController = {
         });
       }
 
-      const isContribution = await Visitors.findOne({
-        contributionId: contributionId,
-      });
+      // const isContribution = await Visitors.findOne({
+      //   contributionId: contributionId,
+      // });
 
-      if (!isContribution) {
-        return res.status(400).json({ message: "Invalid contribution id." });
-      }
+      // if (!isContribution) {
+      //   return res.status(400).json({ message: "Invalid contribution id." });
+      // }
 
       let contribution = await Visitors.findOne({
         contributionId: contributionId,
@@ -723,13 +727,17 @@ const userController = {
         });
       }
 
-      if (!contribution) {
-        return res.status(400).json({ message: "Forbidden" });
-      } else {
-        res.status(200).json({
-          message: contribution,
-        });
-      }
+      // if (!contribution) {
+      //   return res.status(400).json({ message: "Forbidden" });
+      // } else {
+      //   res.status(200).json({
+      //     message: contribution,
+      //   });
+      // }
+
+      res.status(200).json({
+        message: contribution,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
