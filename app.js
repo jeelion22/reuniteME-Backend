@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api", (req, res) => {
-  res.send("Welcome to the ReUniteME's login portal");
+  res.json({message: "Welcome to the ReUniteME's login portal"});
 });
 
 app.use("/api/users", userRouter);
