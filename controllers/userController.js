@@ -208,7 +208,7 @@ const userController = {
         path: "/",
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "None",
         // domain: "reuniteme.netlify.app",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
