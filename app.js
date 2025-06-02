@@ -13,7 +13,7 @@ const morgan = require("morgan");
 
 app.use(
   cors({
-    origin: "https://reuniteme.netlify.app",
+    origin: ["https://reuniteme.netlify.app", "http://localhost:5173"],
     credentials: true,
   })
 );
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/api", (req, res) => {
-  res.json({message: "Welcome to the ReUniteME's API end points!"});
+  res.json({ message: "Welcome to the ReUniteME's API end points!" });
 });
 
 app.use("/api/users", userRouter);
