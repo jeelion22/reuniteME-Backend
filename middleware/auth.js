@@ -2,10 +2,22 @@ const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
 const User = require("../models/user");
 const Admin = require("../models/admin");
+
+const getToken = (req) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1];
+  }
+
+  // Fallback to cookie if header not available
+  return req.cookies?.token || null;
+};
+
 const auth = {
   isAuth: (req, res, next) => {
     try {
-      const token = req.cookies.token;
+     const token = getToken(req);
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -26,7 +38,7 @@ const auth = {
 
   isAuthAdmin: (req, res, next) => {
     try {
-      const token = req.cookies.token;
+     const token = getToken(req);
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
