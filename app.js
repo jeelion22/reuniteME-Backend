@@ -13,7 +13,7 @@ const morgan = require("morgan");
 
 app.use(
   cors({
-    origin: ["https://reuniteme.netlify.app", "http://localhost:5173"],
+    origin: ["https://reuniteme.netlify.app", "http://localhost:5173", "https://reuniteme.onrender.com"],
     credentials: true,
   })
 );
