@@ -11,9 +11,11 @@ const cookieParser = require("cookie-parser");
 
 const morgan = require("morgan");
 
+app.set('trust proxy', 1);
+
 app.use(
   cors({
-    origin: ["https://reuniteme.netlify.app", "http://localhost:5173", "https://reuniteme.onrender.com"],
+    origin:  "https://reuniteme.onrender.com",
     credentials: true,
   })
 );
