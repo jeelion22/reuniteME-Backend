@@ -15,7 +15,7 @@ app.set('trust proxy', 1);
 
 app.use(
   cors({
-    origin:  "https://reuniteme.onrender.com",
+    origin:  "https://reuniteme.netlify.app",
     credentials: true,
   })
 );
