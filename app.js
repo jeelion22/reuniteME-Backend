@@ -18,14 +18,14 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-  req.header("Access-Control-Allow-Origin", "https://reuniteme.netlify.app");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   req.header("Access-Control-Allow-Origin", "https://reuniteme.netlify.app");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
 app.use(cookieParser());
 

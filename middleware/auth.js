@@ -2,10 +2,23 @@ const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
 const User = require("../models/user");
 const Admin = require("../models/admin");
+
+
+const getToken = (req)=>{
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1]
+  }
+
+  return null;
+}
+
+
 const auth = {
   isAuth: (req, res, next) => {
     try {
-      const token = req.cookies.token;
+      const token = req.cookies.token
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });

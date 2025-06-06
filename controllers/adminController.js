@@ -70,7 +70,7 @@ const adminController = {
       res.cookie("token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: "None",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
       });
       res.status(200).json({ message: "login successful", token });
