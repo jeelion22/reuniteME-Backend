@@ -203,15 +203,14 @@ const userController = {
         },
         JWT_SECRET
       );
-
-      res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        // domain: "reuniteme.netlify.app",
-        expires: new Date(Date.now() + 24 * 3600 * 1000),
-      });
+res.cookie("token", token, {
+  path: "/",                  // ✅ Good
+  httpOnly: true,             // ✅ Good (prevents JS access)
+  secure: true,               // ✅ Required for SameSite=None
+  sameSite: "None",           // ✅ Required for cross-site
+  // domain: "reuniteme.netlify.app", // ✅ Better to leave this commented
+  expires: new Date(Date.now() + 24 * 3600 * 1000), // ✅ 1-day expiry
+});
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
       res.status(500).json({ message: error.message });
