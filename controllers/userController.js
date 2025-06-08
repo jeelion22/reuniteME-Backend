@@ -3,6 +3,8 @@ const Visitors = require("../models/reuniteSeekerLogs");
 const sendEmailToVerifyEmail = require("../utils/email");
 const crypto = require("crypto");
 
+const BlockedToken = require("../models/blockedToken")
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {
@@ -200,17 +202,19 @@ const userController = {
       const token = jwt.sign(
         {
           id: user._id,
+          
         },
-        JWT_SECRET
+        JWT_SECRET,
+        {expiresIn : "1d"}
       );
-res.cookie("token", token, {
-  path: "/",                  // ✅ Good
-  httpOnly: true,             // ✅ Good (prevents JS access)
-  secure: true,               // ✅ Required for SameSite=None
-  sameSite: "None",           // ✅ Required for cross-site
-  // domain: "reuniteme.netlify.app", // ✅ Better to leave this commented
-  expires: new Date(Date.now() + 24 * 3600 * 1000), // ✅ 1-day expiry
-});
+// res.cookie("token", token, {
+//   path: "/",                  // ✅ Good
+//   httpOnly: true,             // ✅ Good (prevents JS access)
+//   secure: true,               // ✅ Required for SameSite=None
+//   sameSite: "None",           // ✅ Required for cross-site
+//   // domain: "reuniteme.netlify.app", // ✅ Better to leave this commented
+//   expires: new Date(Date.now() + 24 * 3600 * 1000), // ✅ 1-day expiry
+// });
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -415,17 +419,22 @@ res.cookie("token", token, {
   // },
 
   logout: async (req, res) => {
-    try {
-      res.clearCookie("token", {
-           httpOnly: true,
-        secure: true,
-        sameSite: "None",
-      });
+    const token = req.headers.authorization?.split(" ")[1];
 
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
+const decoded =   jwt.verify(token, JWT_SECRET);
+
+
+
+// if (!decoded || !decoded.exp) {
+//   return res.status(400).json({ message: "Invalid token, cannot determine expiry" });
+// }
+
+const expiresAt = new Date(decoded.exp * 1000); // Convert exp to Date
+
+await BlockedToken.create({ token, expiresAt });
+
+res.status(204).send();
+
   },
 
   upload: async (req, res) => {

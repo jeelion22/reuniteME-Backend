@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
 const User = require("../models/user");
 const Admin = require("../models/admin");
+const blockedToken = require("../models/blockedToken");
+
 
 
 const getToken = (req)=>{
@@ -16,18 +18,22 @@ const getToken = (req)=>{
 
 
 const auth = {
-  isAuth: (req, res, next) => {
+  isAuth: async (req, res, next) => {
     try {
 
-       const token = req.cookies.token;
+      //  const token = req.cookies.token;
 
-      // const token = getToken(req)
+      const token = getToken(req)
 
       console.log("token", token)
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
+
+      const isBlocked = await blockedToken.findOne({token})
+
+        if (isBlocked) return res.status(403).json({ message: "Token is revoked" });
 
       try {
         const decodedToken = jwt.verify(token, config.JWT_SECRET);
@@ -44,9 +50,9 @@ const auth = {
 
   isAuthAdmin: (req, res, next) => {
     try {
-      const token = req.cookies.token;
+      // const token = req.cookies.token;
 
-      // const token = getToken(req)
+      const token = getToken(req)
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
