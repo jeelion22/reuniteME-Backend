@@ -72,6 +72,7 @@ const adminController = {
         secure: true,
         sameSite: "None",
         expires: new Date(Date.now() + 24 * 3600 * 1000),
+    partitioned: true
       });
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
