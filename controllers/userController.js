@@ -204,13 +204,6 @@ const userController = {
         JWT_SECRET
       );
 
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "None",
-expires: new Date(Date.now() +24 * 3600 * 1000)
-});
-
       // res.cookie("token", token, {
       //   path: "/",
       //   httpOnly: true,
@@ -425,6 +418,7 @@ expires: new Date(Date.now() +24 * 3600 * 1000)
   logout: async (req, res) => {
     try {
       res.clearCookie("token", {
+        origin: "/",
         httpOnly: true,
         secure: true,
         sameSite: "None",

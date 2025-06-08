@@ -18,7 +18,12 @@ const getToken = (req)=>{
 const auth = {
   isAuth: (req, res, next) => {
     try {
-      const token = req.cookies.token
+
+       const token = req.cookies.token;
+
+      // const token = getToken(req)
+
+      console.log("token", token)
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -40,6 +45,8 @@ const auth = {
   isAuthAdmin: (req, res, next) => {
     try {
       const token = req.cookies.token;
+
+      // const token = getToken(req)
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
