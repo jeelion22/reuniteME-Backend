@@ -4,36 +4,32 @@ const User = require("../models/user");
 const Admin = require("../models/admin");
 const blockedToken = require("../models/blockedToken");
 
-
-
-const getToken = (req)=>{
+const getToken = (req) => {
   const authHeader = req.headers.authorization;
 
+ 
   if (authHeader && authHeader.startsWith("Bearer ")) {
-    return authHeader.split(" ")[1]
+    return authHeader.split(" ")[1];
   }
 
   return null;
-}
-
+};
 
 const auth = {
   isAuth: async (req, res, next) => {
     try {
-
       //  const token = req.cookies.token;
 
-      const token = getToken(req)
-
-      console.log("token", token)
+      const token = getToken(req);
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const isBlocked = await blockedToken.findOne({token})
+      const isBlocked = await blockedToken.findOne({ token });
 
-        if (isBlocked) return res.status(403).json({ message: "Token is revoked" });
+      if (isBlocked)
+        return res.status(403).json({ message: "Token is revoked" });
 
       try {
         const decodedToken = jwt.verify(token, config.JWT_SECRET);
@@ -48,23 +44,36 @@ const auth = {
     }
   },
 
-  isAuthAdmin: (req, res, next) => {
+  isAuthAdmin: async (req, res, next) => {
     try {
       // const token = req.cookies.token;
 
-      const token = getToken(req)
+      const token = getToken(req);
+
+    
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }
+
+      const isBlocked = await blockedToken.findOne({ token });
+
+      if (isBlocked)
+        return res.status(403).json({ message: "Token is revoked" });
+
       try {
         const decodedToken = jwt.verify(token, config.ADMIN_JWT_SECRET);
         req.adminId = decodedToken.id;
         next();
       } catch (error) {
+
+        console.log(error)
+       
         res.status(401).json({ message: "Invalid token" });
       }
     } catch (error) {
+
+      console.log(error)
       res.status(500).json({ message: error.message });
     }
   },

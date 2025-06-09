@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const s3 = require("../utils/awsConfig");
 const sendEmailToVerifyEmail = require("../utils/email");
 const crypto = require("crypto");
+const BlockedToken = require("../models/blockedToken");
 
 const adminController = {
   createAdmin: async function () {
@@ -64,19 +65,20 @@ const adminController = {
           id: admin._id,
           name: admin.firstname,
         },
-        config.ADMIN_JWT_SECRET
+        config.ADMIN_JWT_SECRET,
+        { expiresIn: "1h" }
       );
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        expires: new Date(Date.now() + 24 * 3600 * 1000),
-   
-      });
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: true,
+      //   sameSite: "None",
+      //   expires: new Date(Date.now() + 24 * 3600 * 1000),
+
+      // });
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
-      console.log(error);
+      
       res.status(500).json({ message: error.message });
     }
   },
@@ -95,6 +97,7 @@ const adminController = {
       }
       res.status(200).json({ admin });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -207,7 +210,12 @@ const adminController = {
 
   logout: async (req, res) => {
     try {
-      res.clearCookie("token", {httpOnly: true, secure: true, sameSite: 'None'});
+      // res.clearCookie("token", {httpOnly: true, secure: true, sameSite: 'None'});
+      const token = req.headers.authorization?.split(" ")[1];
+
+      const decoded = jwt.verify(token, config.ADMIN_JWT_SECRET);
+      const expiresAt = new Date(decoded.exp * 1000);
+      await BlockedToken.create({ token, expiresAt });
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: error.message });
