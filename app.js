@@ -11,12 +11,9 @@ const cookieParser = require("cookie-parser");
 
 const morgan = require("morgan");
 
-
-
 app.use(
   cors({
-    origin:  ["https://reuniteme.netlify.app",],
-  
+    origin: ["https://reuniteme.netlify.app"],
   })
 );
 
