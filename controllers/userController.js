@@ -15,6 +15,7 @@ const {
 
 const s3 = require("../utils/awsConfig");
 const exifParser = require("exif-parser");
+const sharp = require("sharp");
 
 const userController = {
   register: async (req, res) => {
@@ -474,42 +475,70 @@ const userController = {
       latitude = result.tags.GPSLatitude;
       longitude = result.tags.GPSLongitude;
 
+      // compress the image file with the sharp package
+
+      let compressedBuffer = await sharp(buffer)
+        .resize({
+          width: 1920,
+          withoutEnlargement: true,
+        })
+        .jpeg({ quality: 80 })
+        .withMetadata()
+        .toBuffer();
+
+      // If still > 5MB, progressively reduce quality
+      let quality = 80;
+
+      while (compressedBuffer.length > 5 * 1024 * 1024 && quality > 40) {
+        quality -= 10;
+        compressedBuffer = await sharp(buffer)
+          .resize({
+            width: 1920,
+            withoutEnlargement: true,
+          })
+          .jpeg({ quality })
+          .withMetadata()
+          .toBuffer();
+      }
+
+      if (compressedBuffer.length > 5 * 1024 * 1024) {
+        return res.status(400).json({
+          message:
+            "Unable to compress image under 5MB. Please upload a smaller photo",
+        });
+      }
+
       const params = {
         Bucket: bucketName,
         Key: key,
-        Body: buffer,
+        Body: compressedBuffer,
         ContentType: mimetype,
       };
 
-      try {
-        const s3Data = await s3.upload(params).promise();
+      const s3Data = await s3.upload(params).promise();
 
-        await User.findOneAndUpdate(
-          { _id: userId },
-          {
-            $push: {
-              contributions: {
-                bucket: bucketName,
-                key: s3Data.Key,
-                fileName: s3Data.Key.split("/")[1],
-                fileType: mimetype,
-                fileSize: size,
-                location: { latitude, longitude },
-                name,
-                address,
-                phone,
-                description,
-              },
+      await User.findOneAndUpdate(
+        { _id: userId },
+        {
+          $push: {
+            contributions: {
+              bucket: bucketName,
+              key: s3Data.Key,
+              fileName: s3Data.Key.split("/")[1],
+              fileType: mimetype,
+              fileSize: compressedBuffer.length,
+              location: { latitude, longitude },
+              name,
+              address,
+              phone,
+              description,
             },
           },
-          { new: true, upsert: true }
-        );
+        },
+        { new: true, upsert: true }
+      );
 
-        res.status(200).json({ message: "Image uploaded successfully!" });
-      } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-      }
+      res.status(200).json({ message: "Image uploaded successfully!" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: error.message });
