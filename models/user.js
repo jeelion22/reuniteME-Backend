@@ -3,6 +3,8 @@ const crypto = require("crypto");
 const validator = require("validator");
 const contributionShema = require("./contributions");
 
+const { encrypt, decrypt } = require("../utils/encryption");
+
 const userSchema = mongoose.Schema({
   firstname: {
     type: String,
@@ -147,6 +149,46 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+});
+
+// Encrypt before save
+userSchema.pre("save", function (next) {
+  if (this.isModified("authorizedIdNo") && this.authorizedIdNo) {
+    try {
+      this.authorizedIdNo = encrypt(this.authorizedIdNo);
+    } catch (err) {
+      return next(err);
+    }
+  }
+  next();
+});
+
+// Encrypt on findOneAndUpdate
+userSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update && update.authorizedIdNo) {
+    update.authorizedIdNo = encrypt(update.authorizedIdNo);
+  }
+  next();
+});
+
+// Helper to decrypt a single doc
+function decryptAuthorizedIdNo(doc) {
+  if (!doc) return;
+  if (doc.authorizedIdNo) {
+    try {
+      doc.authorizedIdNo = decrypt(doc.authorizedIdNo);
+    } catch (error) {
+      console.error("Error decrypting authorizedIdNo", error);
+    }
+  }
+}
+
+// Decrypt after fetching
+userSchema.post("init", decryptAuthorizedIdNo); // runs when a doc is initialized (single doc)
+userSchema.post("findOne", decryptAuthorizedIdNo); // single doc
+userSchema.post("find", function (docs) {
+  docs.forEach((doc) => decryptAuthorizedIdNo(doc));
 });
 
 userSchema.methods.createEmailVerificationToken = function () {
