@@ -1,32 +1,33 @@
 const mongoose = require("mongoose");
 const adminController = require("./controllers/adminController");
+const { MONGODB_PORT, MONGODB_URI } = require("./utils/config");
+// const { connectMongo, mongoose } = require("./csfleClient");
 
 const config = require("./utils/config");
 
 const app = require("./app");
 
 console.log("Connecting to MongoDB...");
-// connect to MongoDB using mongoose
-mongoose
-  .connect(config.MONGODB_URI)
+
+const connectMongo = async () => {
+  await mongoose.connect(MONGODB_URI);
+};
+
+connectMongo()
   .then(() => {
     console.log("Connected to MongoDB...");
 
-    adminController
-      .createAdmin()
-      .then(() => {
-        console.log("Admin user setup completed");
-        const PORT = config.MONGODB_PORT || 5000;
+    return adminController.createAdmin();
+  })
+  .then(() => {
+    console.log("Admin user setup completed");
+    const PORT = config.MONGODB_PORT || 5000;
 
-        app.listen(PORT, () => {
-          console.log(`Server running on port ${PORT}`);
-        });
-      })
-      .catch((error) => {
-        console.log("Failed to create admin user", error);
-        process.exit(1);
-      });
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   })
   .catch((error) => {
-    console.log("Error connecting to MongoDB", error);
+    console.log("Error during startup process", error);
+    process.exit(1);
   });
