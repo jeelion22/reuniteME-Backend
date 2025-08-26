@@ -24,6 +24,15 @@ const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
 const ADMIN_PERMISSIONS = process.env.ADMIN_PERMISSIONS;
 
+const ENC_KEY = process.env.ENC_KEY;
+
+const ALGORITHM = process.env.ALGORITHM;
+
+const IV_LENGTH = process.env.IV_LENGTH;
+
+// const LOCAL_MASTER_KEY = process.env.LOCAL_MASTER_KEY;
+// const DB_NAME = process.env.DB_NAME;
+
 // export all these configuration variables
 module.exports = {
   MONGODB_URI,
@@ -48,4 +57,11 @@ module.exports = {
   AWS_REGION,
   AWS_ACCESS_KEY,
   AWS_SECRET_ACCESS_KEY,
+
+  // LOCAL_MASTER_KEY,
+  // DB_NAME,
+
+  ENC_KEY,
+  ALGORITHM,
+  IV_LENGTH,
 };
