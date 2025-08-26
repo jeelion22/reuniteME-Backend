@@ -224,7 +224,7 @@ const userController = {
     try {
       const userId = req.userId;
 
-      const user = await User.findOne({ _id: userId, isActive: true }).select(
+      let user = await User.findOne({ _id: userId, isActive: true }).select(
         "-__v -passwordHash -emailVerificationToken -emailVerificationTokenExpires  -whoDeleted -key"
       );
 
