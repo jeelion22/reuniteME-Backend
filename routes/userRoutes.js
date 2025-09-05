@@ -69,6 +69,19 @@ userRouter.put(
   userController.updateStatus
 );
 
+// fetch reunite seeker's form response
+userRouter.get(
+  "/logs/:contributionId",
+  auth.isAuth,
+  userController.getReuniteSeekerFormResponse
+);
+
+userRouter.put(
+  "/logs/update/:responseId/:contributionId",
+  auth.isAuth,
+  userController.updateResponseForm
+);
+
 userRouter.put("/password/reset", userController.forgotPassword);
 
 userRouter.get(
