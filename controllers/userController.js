@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const ReuniteSeekersLogs = require("../models/reuniteSeekerLogs");
 const Visitors = require("../models/reuniteSeekerLogs");
 const sendEmailToVerifyEmail = require("../utils/email");
 const crypto = require("crypto");
@@ -16,6 +17,7 @@ const {
 const s3 = require("../utils/awsConfig");
 const exifParser = require("exif-parser");
 const sharp = require("sharp");
+const reuniteSeekerLogs = require("../models/reuniteSeekerLogs");
 
 const userController = {
   register: async (req, res) => {
@@ -744,20 +746,24 @@ const userController = {
       //   return res.status(400).json({ message: "Invalid contribution id." });
       // }
 
-      let contribution = await Visitors.findOne({
+      let contribution = await Visitors.find({
         contributionId: contributionId,
         visitorsId: userId,
         meetingDate: { $gte: Date.now() },
         checking: true,
-      });
+      })
+        .sort({ createdAt: -1 })
+        .limit(1);
 
-      if (!contribution) {
-        contribution = await Visitors.findOne({
+      if (!contribution.length) {
+        contribution = await Visitors.find({
           contributionId: contributionId,
           visitorsId: { $ne: userId },
           meetingDate: { $gt: Date.now() },
           checking: true,
-        });
+        })
+          .sort({ createdAt: -1 })
+          .limit(1);
       }
 
       // if (!contribution) {
@@ -769,8 +775,56 @@ const userController = {
       // }
 
       res.status(200).json({
-        message: contribution,
+        message: contribution[0],
       });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // get resunite seeker's response-form status (filled before getting location information)
+
+  getReuniteSeekerFormResponse: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const contributionId = req.params.contributionId;
+
+      const reuniteSeekerLog = await ReuniteSeekersLogs.find({
+        contributionId,
+        visitorsId: userId,
+      })
+        .sort({ createdAt: -1 })
+        .limit(1);
+
+      if (!reuniteSeekerLog.length) {
+        return res.status(404).json({
+          message: "No logs found",
+        });
+      }
+
+      res.status(200).json(reuniteSeekerLog[0]);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  updateResponseForm: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const { contributionId, responseId } = req.params;
+
+      const updatedLog = await ReuniteSeekersLogs.findOneAndUpdate(
+        { visitorsId: userId, contributionId, _id: responseId },
+        { ...req.body },
+        { new: true }
+      );
+
+      if (!updatedLog) {
+        return res.status(400).json({ message: "No logs found" });
+      }
+
+      return res.status(200).json(updatedLog);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
