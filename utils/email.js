@@ -23,7 +23,7 @@ const sendEmailToVerifyEmail = async (option) => {
     from: "ReuniteME support<support@reuniteme.com>",
     to: option.email,
     subject: option.subject,
-    text: option.message,
+    html: option.message,
   };
   await transporter.sendMail(emailOptions);
 };
