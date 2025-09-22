@@ -18,6 +18,7 @@ const s3 = require("../utils/awsConfig");
 const exifParser = require("exif-parser");
 const sharp = require("sharp");
 const reuniteSeekerLogs = require("../models/reuniteSeekerLogs");
+const { createEmailContent } = require("../utils/emailContent");
 
 const userController = {
   register: async (req, res) => {
@@ -61,21 +62,21 @@ const userController = {
         await newUser.save();
       }
 
-      const verificationURL = `https://reuniteme.netlify.app/users/verify/${emailToken}`;
-      const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
+      const verificationLink = `https://reuniteme.netlify.app/users/verify/${emailToken}`;
+      // const message = `Please use the link below to verify your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.`;
 
       if (user) {
         await sendEmailToVerifyEmail({
           email: user.email,
           subject: "Verify your ReUniteME account",
-          message: message,
+          message: createEmailContent(user?.firstname, verificationLink),
         });
         await user.save();
       } else {
         await sendEmailToVerifyEmail({
           email: newUser.email,
           subject: "Verify your ReUniteME account",
-          message: message,
+          message: createEmailContent(user?.firstname, verificationLink),
         });
         await newUser.save();
       }
