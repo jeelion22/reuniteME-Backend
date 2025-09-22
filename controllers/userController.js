@@ -82,7 +82,7 @@ const userController = {
 
       res.status(201).json({
         status: "success",
-        message: `${newUser && "User created successfully."}`,
+        message: newUser && "User created successfully.",
       });
     } catch (error) {
       console.log(error);
