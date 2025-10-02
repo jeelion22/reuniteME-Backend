@@ -7,25 +7,29 @@ const {
 } = require("./config");
 
 const sendEmailToVerifyEmail = async (option) => {
-  const transporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: EMAIL_PORT,
+  try {
+    const transporter = nodemailer.createTransport({
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
 
-    secure: true,
+      secure: true,
 
-    auth: {
-      user: EMAIL_USERNAME,
-      pass: EMAIL_PWD,
-    },
-  });
+      auth: {
+        user: EMAIL_USERNAME,
+        pass: EMAIL_PWD,
+      },
+    });
 
-  const emailOptions = {
-    from: "ReuniteME support<support@reuniteme.com>",
-    to: option.email,
-    subject: option.subject,
-    html: option.message,
-  };
-  await transporter.sendMail(emailOptions);
+    const emailOptions = {
+      from: "ReuniteME support<contact.reuniteme@gmail.com>",
+      to: option.email,
+      subject: option.subject,
+      html: option.message,
+    };
+    await transporter.sendMail(emailOptions);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = sendEmailToVerifyEmail;
