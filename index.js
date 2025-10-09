@@ -10,13 +10,16 @@ const app = require("./app");
 console.log("Connecting to MongoDB...");
 
 const connectMongo = async () => {
-  await mongoose.connect(MONGODB_URI);
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error.message);
+  }
 };
 
 connectMongo()
   .then(() => {
-    console.log("Connected to MongoDB...");
-
     return adminController.createAdmin();
   })
   .then(() => {
