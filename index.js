@@ -24,7 +24,7 @@ connectMongo()
   })
   .then(() => {
     console.log("Admin user setup completed");
-    const PORT = config.MONGODB_PORT || 5000;
+    const PORT = config.MONGODB_PORT || 6000;
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
