@@ -78,7 +78,6 @@ const adminController = {
       // });
       res.status(200).json({ message: "login successful", token });
     } catch (error) {
-      
       res.status(500).json({ message: error.message });
     }
   },
