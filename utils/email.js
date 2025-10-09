@@ -18,7 +18,7 @@ const sendEmailToVerifyEmail = async (option) => {
     const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
     oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
-    const { token: accessToken } = await oAuth2Client.getAccessToken();
+    // const { token: accessToken } = await oAuth2Client.getAccessToken();
 
     // Create Nodemailer transporter
 
@@ -31,7 +31,6 @@ const sendEmailToVerifyEmail = async (option) => {
         clientId,
         clientSecret,
         refreshToken,
-        accessToken,
       },
     });
 
