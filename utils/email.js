@@ -1,34 +1,58 @@
 const nodemailer = require("nodemailer");
-const {
-  EMAIL_HOST,
-  EMAIL_PORT,
-  EMAIL_PWD,
-  EMAIL_USERNAME,
-} = require("./config");
+const { google } = require("googleapis");
+const EmailCredential = require("../models/EmailCredential");
+const { decryptOAuth2Secret } = require("../utils/emailCredentialEncryption");
 
 const sendEmailToVerifyEmail = async (option) => {
   try {
-    const transporter = nodemailer.createTransport({
-      host: EMAIL_HOST,
-      port: EMAIL_PORT,
+    // Fetch credentails
+    const cred = await EmailCredential.findOne();
+    if (!cred) throw new Error("Email credentials not configured.");
 
-      secure: true,
+    const clientId = decryptOAuth2Secret(cred.clientId);
+    const clientSecret = decryptOAuth2Secret(cred.clientSecret);
+    const refreshToken = decryptOAuth2Secret(cred.refreshToken);
+    const senderEmail = cred.senderEmail;
+
+    // OAuth2 client setup
+    const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret);
+    oAuth2Client.setCredentials({ refresh_token: refreshToken });
+
+    const { token: accessToken } = await oAuth2Client.getAccessToken();
+
+    // Create Nodemailer transporter
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
 
       auth: {
-        user: EMAIL_USERNAME,
-        pass: EMAIL_PWD,
+        type: "OAuth2",
+        user: "contact.reuniteme@gmail.com",
+        clientId,
+        clientSecret,
+        refreshToken,
+        accessToken,
       },
     });
 
-    const emailOptions = {
-      from: "ReuniteME support<contact.reuniteme@gmail.com>",
+    // 3. Define email
+    const mailOptions = {
+      from: `ReUniteME <${senderEmail}>`,
       to: option.email,
       subject: option.subject,
       html: option.message,
     };
-    await transporter.sendMail(emailOptions);
+
+    // 4. Send email
+    const result = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent:", result.messageId);
+    return result;
   } catch (error) {
-    console.log(error);
+    console.error(
+      "❌ Error sending email:",
+      error.response?.data || error.message
+    );
+    throw error;
   }
 };
 
