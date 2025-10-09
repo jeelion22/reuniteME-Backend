@@ -2,7 +2,8 @@ const express = require("express");
 
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
-const oAuth2Router = require("./routes/oAuth2Routes");
+
+const gmailRouter = require("./routes/gmailRoutes");
 
 const cors = require("cors");
 
@@ -26,13 +27,12 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", oAuth2Router);
-
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the ReUniteME's API end points!" });
 });
 
 app.use("/api/users", userRouter);
 app.use("/api/admins", adminRouter);
+app.use("/api/admin/gmail", gmailRouter);
 
 module.exports = app;
