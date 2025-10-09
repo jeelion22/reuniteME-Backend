@@ -30,14 +30,9 @@ const ALGORITHM = process.env.ALGORITHM;
 
 const IV_LENGTH = process.env.IV_LENGTH;
 
-const CLIENT_ID = process.env.client_id;
-const CLIENT_SECRET = process.env.client_secret;
-const REDIRECT_URL = process.env.redirect_url;
+const EMAIL_ENCRYPTION_ALGORITHM = process.env.EMAIL_ENCRYPTION_ALGORITHM;
+const EMAIL_ENCRYPTION_SECRET_KEY = process.env.EMAIL_ENCRYPTION_SECRET_KEY;
 
-// const LOCAL_MASTER_KEY = process.env.LOCAL_MASTER_KEY;
-// const DB_NAME = process.env.DB_NAME;
-
-// export all these configuration variables
 module.exports = {
   MONGODB_URI,
   MONGODB_PORT,
@@ -62,14 +57,10 @@ module.exports = {
   AWS_ACCESS_KEY,
   AWS_SECRET_ACCESS_KEY,
 
-  // LOCAL_MASTER_KEY,
-  // DB_NAME,
-
   ENC_KEY,
   ALGORITHM,
   IV_LENGTH,
 
-  CLIENT_SECRET,
-  CLIENT_ID,
-  REDIRECT_URL,
+  EMAIL_ENCRYPTION_ALGORITHM,
+  EMAIL_ENCRYPTION_SECRET_KEY,
 };
