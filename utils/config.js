@@ -33,6 +33,9 @@ const IV_LENGTH = process.env.IV_LENGTH;
 const EMAIL_ENCRYPTION_ALGORITHM = process.env.EMAIL_ENCRYPTION_ALGORITHM;
 const EMAIL_ENCRYPTION_SECRET_KEY = process.env.EMAIL_ENCRYPTION_SECRET_KEY;
 
+// sendgrid api key
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+const SENDER_EMAIL = process.env.SENDER_EMAIL;
 module.exports = {
   MONGODB_URI,
   MONGODB_PORT,
@@ -63,4 +66,7 @@ module.exports = {
 
   EMAIL_ENCRYPTION_ALGORITHM,
   EMAIL_ENCRYPTION_SECRET_KEY,
+
+  SENDGRID_API_KEY,
+  SENDER_EMAIL,
 };
