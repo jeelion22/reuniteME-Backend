@@ -1,7 +1,8 @@
 const User = require("../models/user");
 const ReuniteSeekersLogs = require("../models/reuniteSeekerLogs");
 const Visitors = require("../models/reuniteSeekerLogs");
-const sendEmailToVerifyEmail = require("../utils/email");
+// const sendEmailToVerifyEmail = require("../utils/email");
+const sendEmailToVerifyEmail = require("../utils/sendGridEmail");
 const crypto = require("crypto");
 
 const BlockedToken = require("../models/blockedToken");
