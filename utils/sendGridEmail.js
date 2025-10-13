@@ -9,6 +9,9 @@ const sendEmailToVerifyEmail = async (option) => {
     from: `ReUniteME <${SENDER_EMAIL}>`,
     subject: option.subject,
     html: option.message,
+    trackingSettings: {
+      clickTracking: { enable: false, enableText: false },
+    },
   };
 
   try {
