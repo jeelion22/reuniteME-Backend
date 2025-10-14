@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const user = require("../models/user");
 const jwt = require("jsonwebtoken");
 const s3 = require("../utils/awsConfig");
-const sendEmailToVerifyEmail = require("../utils/email");
+const sendEmailToVerifyEmail = require("../utils/sendGridEmail");
 const crypto = require("crypto");
 const BlockedToken = require("../models/blockedToken");
 
