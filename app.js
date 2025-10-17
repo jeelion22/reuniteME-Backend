@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
@@ -26,6 +27,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the ReUniteME's API end points!" });
