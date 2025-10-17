@@ -35,7 +35,7 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
             <table class="wrapper" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-spacing:0;font-family:sans-serif;color:#333333;max-width:600px;margin:0 auto;">
                 <tr>
                     <td class="header" style="background-color: #ffffff; padding: 20px 0; text-align: center;">
-                        <img src="https://reuniteme-backend.onrender.com/public/images/reuniteme_logo.png alt="ReUniteME Logo" width="60" style="border:0; -ms-interpolation-mode:bicubic;">
+                        <img src="https://reuniteme-backend.onrender.com/public/images/reuniteme_logo.png" alt="ReUniteME Logo" width="60" style="border:0; -ms-interpolation-mode:bicubic;">
                         <p style="font-size: 24px; font-weight: bold; color: #6a0dad; margin: 10px 0 0 0;">ReUniteME</p>
                     </td>
                 </tr>
