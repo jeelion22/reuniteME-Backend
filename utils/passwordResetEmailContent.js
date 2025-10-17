@@ -1,4 +1,7 @@
 const passwordResetEmailContent = (name = "", verificationLink) => {
+  const date = new Date();
+  const year = date.getFullYear();
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +27,7 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; min-width: 100%; background-color: #f4f4f4;">
+<body style="margin: 3rem; padding: 0; min-width: 100%; background-color: #f4f4f4;">
     <center style="width: 100%; background-color: #f4f4f4;">
         <div style="max-width: 600px; margin: 0 auto;">
             <!--[if (gte mso 9)|(IE)]>
@@ -65,7 +68,7 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
                 </tr>
                 <tr>
                     <td class="footer" style="padding: 20px; text-align: center; font-size: 12px; color: #888888;">
-                        <p style="margin: 0;">&copy; 2023 ReUniteME. All rights reserved.</p>
+                        <p style="margin: 0;">&copy; ${year} ReUniteME. All rights reserved.</p>
                         <p style="margin: 5px 0 0 0;">123 Missing Person Dr, City, State, 12345</p>
                     </td>
                 </tr>
