@@ -69,7 +69,9 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
                 <tr>
                     <td class="footer" style="padding: 20px; text-align: center; font-size: 12px; color: #888888;">
                         <p style="margin: 0;">&copy; ${year} ReUniteME. All rights reserved.</p>
-                        <p style="margin: 5px 0 0 0;">123 Missing Person Dr, City, State, 12345</p>
+                          <!-- <p style="margin: 5px 0 0 0">
+                123 Missing Person Dr, City, State, 12345
+              </p> -->
                     </td>
                 </tr>
             </table>
