@@ -27,7 +27,7 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
         }
     </style>
 </head>
-<body style="margin: 3rem; padding: 0; min-width: 100%; background-color: #f4f4f4;">
+<body style="margin: 0 padding: 1.5rem; min-width: 100%; background-color: #f4f4f4;">
     <center style="width: 100%; background-color: #f4f4f4;">
         <div style="max-width: 600px; margin: 0 auto;">
             <!--[if (gte mso 9)|(IE)]>
