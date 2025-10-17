@@ -264,7 +264,7 @@ const userController = {
       await sendEmailToVerifyEmail({
         email: user.email,
         subject: "Password reset link for your ReUniteME account",
-        message: passwordResetEmailTemplate(user?.name, verificationURL),
+        message: passwordResetEmailTemplate(user?.firstname, verificationURL),
       });
 
       await user.save();
