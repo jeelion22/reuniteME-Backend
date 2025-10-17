@@ -80,3 +80,5 @@ const passwordResetEmailContent = (name = "", verificationLink) => {
 </body>
 </html>`;
 };
+
+module.exports = passwordResetEmailContent;
