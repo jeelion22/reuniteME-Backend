@@ -20,6 +20,7 @@ const exifParser = require("exif-parser");
 const sharp = require("sharp");
 const reuniteSeekerLogs = require("../models/reuniteSeekerLogs");
 const { createEmailContent } = require("../utils/emailContent");
+const passwordResetEmailTemplate = require("../utils/passwordResetEmailContent");
 
 const userController = {
   register: async (req, res) => {
@@ -258,12 +259,12 @@ const userController = {
 
       const verificationURL = `https://reuniteme.netlify.app/users/password/reset/verify/${emailToken}`;
 
-      const message = `Please use the link below to reset password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
+      // const message = `Please use the link below to reset password for your account.\n\n${verificationURL}\n\nThis link will be valid only for 30 minutes.\n\nIf it is not initiated by you, then you can ignore this email.`;
 
       await sendEmailToVerifyEmail({
         email: user.email,
         subject: "Password reset link for your ReUniteME account",
-        message: message,
+        message: passwordResetEmailTemplate(user?.name, verificationURL),
       });
 
       await user.save();
