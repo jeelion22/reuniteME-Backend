@@ -9,6 +9,8 @@ const app = require("./app");
 
 console.log("Connecting to MongoDB...");
 
+console.log(MONGODB_URI)
+
 const connectMongo = async () => {
   try {
     await mongoose.connect(MONGODB_URI);

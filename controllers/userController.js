@@ -2,7 +2,8 @@ const User = require("../models/user");
 const ReuniteSeekersLogs = require("../models/reuniteSeekerLogs");
 const Visitors = require("../models/reuniteSeekerLogs");
 // const sendEmailToVerifyEmail = require("../utils/email");
-const sendEmailToVerifyEmail = require("../utils/sendGridEmail");
+// const sendEmailToVerifyEmail = require("../utils/sendGridEmail");
+const sendEmailToVerifyEmail = require("../utils/emailService");
 const crypto = require("crypto");
 
 const BlockedToken = require("../models/blockedToken");
@@ -244,6 +245,8 @@ const userController = {
   forgotPassword: async (req, res) => {
     try {
       const email = req.body.email;
+
+      console.log("Email: ", email)
 
       const user = await User.findOne({
         email,

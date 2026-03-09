@@ -36,6 +36,15 @@ const EMAIL_ENCRYPTION_SECRET_KEY = process.env.EMAIL_ENCRYPTION_SECRET_KEY;
 // sendgrid api key
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const SENDER_EMAIL = process.env.SENDER_EMAIL;
+
+// oauth2.0 email service
+const GMAIL_REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
+const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID
+const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET
+const GMAIL_REDIRECT_URI = process.env.GMAIL_REDIRECT_URI
+const GMAIL_USERNAME = process.env.GMAIL_USERNAME
+const GMAIL_SERVICE = process.env.GMAIL_SERVICE
+
 module.exports = {
   MONGODB_URI,
   MONGODB_PORT,
@@ -69,4 +78,11 @@ module.exports = {
 
   SENDGRID_API_KEY,
   SENDER_EMAIL,
+
+  GMAIL_REFRESH_TOKEN,
+  GMAIL_CLIENT_ID,
+  GMAIL_CLIENT_SECRET,
+  GMAIL_REDIRECT_URI,
+  GMAIL_USERNAME,
+  GMAIL_SERVICE
 };
